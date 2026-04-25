@@ -41,10 +41,10 @@ body {
 .app {
   position: relative;
   z-index: 1;
-  width: min(100% - 24px, 42rem);
+  width: min(100% - 16px, 42rem);
   min-height: 100dvh;
   margin: 0 auto;
-  padding: clamp(16px, 3vw, 32px) clamp(12px, 3vw, 28px) clamp(24px, 4vw, 40px);
+  padding: 12px 8px 24px;
 }
 
 .panel {
@@ -55,7 +55,7 @@ body {
 }
 
 .home-card {
-  padding: clamp(18px, 3vw, 30px);
+  padding: clamp(16px, 2.8vw, 28px);
   text-align: center;
 }
 
@@ -63,7 +63,7 @@ body {
 .result-card,
 .error-card,
 .share-overlay {
-  padding: clamp(18px, 3vw, 30px);
+  padding: clamp(14px, 2.6vw, 26px);
 }
 
 .brand-icon {
@@ -82,8 +82,10 @@ body {
 
 h1 {
   margin: 0;
-  font-size: clamp(1.9rem, 4vw, 2.8rem);
+  font-size: clamp(1.75rem, 6.2vw, 2.8rem);
   line-height: 1.2;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .subtitle,
@@ -136,8 +138,10 @@ button {
 
 h2 {
   margin: 18px 0 20px;
-  font-size: clamp(1.35rem, 3vw, 2rem);
+  font-size: clamp(1.2rem, 5.4vw, 2rem);
   line-height: 1.45;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .progress-meta {
@@ -147,6 +151,7 @@ h2 {
   gap: 12px;
   font-size: 14px;
   font-weight: 700;
+  flex-wrap: wrap;
 }
 
 .progress-bar {
@@ -171,9 +176,9 @@ h2 {
 
 .option-button {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 12px;
-  padding: clamp(14px, 2.2vw, 18px) clamp(14px, 2.4vw, 20px);
+  padding: clamp(12px, 2.1vw, 18px) clamp(12px, 2.2vw, 18px);
   background: #fff;
   text-align: left;
 }
@@ -192,6 +197,9 @@ h2 {
 .option-copy {
   flex: 1;
   line-height: 1.5;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .tagline,
@@ -199,11 +207,13 @@ h2 {
 .auxiliary,
 .share-line {
   line-height: 1.7;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .tagline {
-  margin: 12px 0 0;
-  font-size: 18px;
+  margin: 10px 0 0;
+  font-size: clamp(1rem, 4.2vw, 1.125rem);
   color: #8a5d2f;
 }
 
@@ -214,7 +224,7 @@ h2 {
 
 .result-hero {
   margin: clamp(16px, 2.5vw, 22px) 0;
-  padding: clamp(16px, 2.6vw, 22px);
+  padding: clamp(14px, 2.3vw, 20px);
   border-radius: 20px;
   background: linear-gradient(135deg, rgba(255, 207, 69, 0.22), rgba(255, 167, 182, 0.2));
 }
@@ -233,7 +243,8 @@ h2 {
 }
 
 .result-image-card {
-  margin: clamp(14px, 2.5vw, 24px) 0;
+  width: min(100%, 168px);
+  margin: 12px auto 16px;
   border-radius: clamp(18px, 2.5vw, 28px);
   overflow: hidden;
   background: rgba(255, 255, 255, 0.78);
@@ -243,6 +254,7 @@ h2 {
 .result-image {
   display: block;
   width: 100%;
+  max-width: 100%;
   aspect-ratio: 4 / 5;
   object-fit: contain;
   background: #fff7ea;
@@ -285,10 +297,15 @@ h2 {
 @media (min-width: 700px) {
   .app {
     width: min(100% - 48px, 52rem);
+    padding: clamp(16px, 2.2vw, 32px) clamp(16px, 2.4vw, 28px) clamp(28px, 4vw, 40px);
   }
 
   .result-actions {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .result-image-card {
+    width: min(100%, 220px);
   }
 
   .share-overlay {
