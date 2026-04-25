@@ -1,0 +1,243 @@
+import { QUESTIONS, RESULTS, AUXILIARY_COPY } from "./data/content.js";
+import {
+  resolveAuxiliaryCode,
+  resolveResultByType,
+  resolveTypeCode
+} from "./core/engine.js";
+import { startBackground } from "./ui/background.js";
+import {
+  answerQuestion,
+  clearSession,
+  createInitialState,
+  goBackOneQuestion,
+  loadLastResult,
+  loadSession,
+  saveLastResult,
+  saveSession
+} from "./core/state.js";
+import {
+  renderHomeView,
+  renderErrorView,
+  renderQuizView,
+  renderResultView,
+  renderShareOverlay
+} from "./ui/templates.js";
+import { buildShareCardModel, drawShareCard } from "./ui/shareCard.js";
+
+let mode = "home";
+let quizState = loadSession(window.localStorage);
+let finalViewModel = null;
+let shareImageUrl = "";
+let cachedLastResult = loadLastResult(window.localStorage);
+
+const app = document.querySelector("#app");
+const bgCanvas = document.querySelector("#bg-canvas");
+const shareCanvas = document.querySelector("#share-canvas");
+
+startBackground(bgCanvas);
+
+function computeResultViewModel() {
+  if (
+    quizState.currentQuestionIndex === 0 &&
+    cachedLastResult?.result &&
+    cachedLastResult?.auxiliaryCode
+  ) {
+    return {
+      result: cachedLastResult.result,
+      typeCode: cachedLastResult.typeCode,
+      auxiliaryCode: cachedLastResult.auxiliaryCode,
+      auxiliaryText: AUXILIARY_COPY[cachedLastResult.auxiliaryCode] ?? ""
+    };
+  }
+
+  const typeCode = resolveTypeCode(quizState.scores);
+  const auxiliaryCode = resolveAuxiliaryCode(quizState.scores);
+  const result = resolveResultByType(RESULTS, typeCode) ?? RESULTS[0];
+
+  return {
+    result,
+    typeCode,
+    auxiliaryCode,
+    auxiliaryText: AUXILIARY_COPY[auxiliaryCode] ?? ""
+  };
+}
+
+function determineInitialMode() {
+  if (quizState.currentQuestionIndex > 0 && quizState.currentQuestionIndex < QUESTIONS.length) {
+    return "quiz";
+  }
+
+  if (quizState.currentQuestionIndex >= QUESTIONS.length) {
+    return "result";
+  }
+
+  return cachedLastResult ? "result" : "home";
+}
+
+function render() {
+  if (!app) {
+    return;
+  }
+
+  if (mode === "home") {
+    app.innerHTML = renderHomeView({ completedCount: RESULTS.length });
+    return;
+  }
+
+  if (mode === "quiz") {
+    const safeIndex = Math.min(
+      quizState.currentQuestionIndex,
+      QUESTIONS.length - 1
+    );
+    app.innerHTML = renderQuizView({
+      index: safeIndex,
+      total: QUESTIONS.length,
+      question: QUESTIONS[safeIndex]
+    });
+    return;
+  }
+
+  finalViewModel = computeResultViewModel();
+  cachedLastResult = {
+    typeCode: finalViewModel.typeCode,
+    auxiliaryCode: finalViewModel.auxiliaryCode,
+    result: finalViewModel.result
+  };
+  saveLastResult(window.localStorage, cachedLastResult);
+  app.innerHTML = renderResultView(finalViewModel);
+}
+
+function renderError(message) {
+  if (!app) {
+    return;
+  }
+
+  app.innerHTML = renderErrorView(message);
+}
+
+function closeShareOverlay() {
+  const overlay = document.querySelector(".overlay-backdrop");
+  if (overlay) {
+    overlay.remove();
+  }
+}
+
+function triggerDownload(fileName, href) {
+  const link = document.createElement("a");
+  link.download = fileName;
+  link.href = href;
+  link.click();
+}
+
+function openShare() {
+  if (!finalViewModel || !shareCanvas) {
+    return;
+  }
+
+  const ctx = shareCanvas.getContext("2d");
+  if (!ctx) {
+    return;
+  }
+
+  const model = buildShareCardModel(finalViewModel);
+  const image = new Image();
+
+  const finish = (iconImage) => {
+    drawShareCard(ctx, model, iconImage);
+    shareImageUrl = shareCanvas.toDataURL("image/png");
+    closeShareOverlay();
+    document.body.insertAdjacentHTML(
+      "beforeend",
+      renderShareOverlay({ resultName: model.title })
+    );
+    const preview = document.querySelector("#share-preview-image");
+    if (preview) {
+      preview.src = shareImageUrl;
+    }
+  };
+
+  image.onload = () => finish(image);
+  image.onerror = () => finish(null);
+  image.src = "./icon.png";
+}
+
+document.addEventListener("click", (event) => {
+  const target = event.target.closest("[data-action], [data-option-key]");
+  if (!target) {
+    return;
+  }
+
+  if (target.dataset.action === "start-quiz") {
+    quizState = createInitialState();
+    saveSession(window.localStorage, quizState);
+    cachedLastResult = null;
+    shareImageUrl = "";
+    mode = "quiz";
+    render();
+    return;
+  }
+
+  if (target.dataset.optionKey) {
+    const question = QUESTIONS[quizState.currentQuestionIndex];
+    if (!question) {
+      return;
+    }
+
+    quizState = answerQuestion(
+      quizState,
+      QUESTIONS,
+      question.id,
+      target.dataset.optionKey
+    );
+    saveSession(window.localStorage, quizState);
+    mode = quizState.currentQuestionIndex >= QUESTIONS.length ? "result" : "quiz";
+    render();
+    return;
+  }
+
+  if (target.dataset.action === "go-back") {
+    quizState = goBackOneQuestion(quizState, QUESTIONS);
+    saveSession(window.localStorage, quizState);
+    render();
+    return;
+  }
+
+  if (target.dataset.action === "restart-quiz") {
+    quizState = createInitialState();
+    clearSession(window.localStorage);
+    closeShareOverlay();
+    shareImageUrl = "";
+    mode = "home";
+    render();
+    return;
+  }
+
+  if (target.dataset.action === "open-share") {
+    openShare();
+    return;
+  }
+
+  if (target.dataset.action === "download-share" && shareImageUrl) {
+    const fileName = `maobti-${finalViewModel?.result.name ?? "share"}.png`;
+    triggerDownload(fileName, shareImageUrl);
+    return;
+  }
+
+  if (target.dataset.action === "close-share") {
+    closeShareOverlay();
+    return;
+  }
+
+  if (target.dataset.action === "reload-app") {
+    window.location.reload();
+  }
+});
+
+mode = determineInitialMode();
+
+try {
+  render();
+} catch (error) {
+  console.error(error);
+  renderError("哎呀，出错了，请重启试试吧~");
+}

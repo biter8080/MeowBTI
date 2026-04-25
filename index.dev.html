@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,viewport-fit=cover"
+    />
+    <title>猫BTI</title>
+    <link rel="stylesheet" href="./css/style.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <canvas id="bg-canvas" aria-hidden="true"></canvas>
+      <main id="app" class="app" aria-live="polite"></main>
+      <canvas
+        id="share-canvas"
+        class="hidden-canvas"
+        width="1080"
+        height="1920"
+      ></canvas>
+    </div>
+    <script src="./js/app.bundle.js"></script>
+  </body>
+</html>
