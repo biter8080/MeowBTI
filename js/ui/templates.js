@@ -1,21 +1,101 @@
-export function renderHomeView({ completedCount, unlockedCount }) {
+(function (global) {
+const MaoBTI = global.MaoBTI || (global.MaoBTI = {});
+
+function renderHomeView({ completedCount, unlockedCount }) {
   return `
-    <section class="panel home-card">
-      <img class="brand-icon" src="./icon.png" alt="猫BTI" />
-      <p class="eyebrow">离线猫格测试</p>
-      <h1>测一测你是哪种猫猫人格</h1>
-      <p class="subtitle">24题轻测试，结果仅供娱乐，但很适合截图发朋友。</p>
-      <p class="meta">当前已整理 ${completedCount} 种猫格结果卡，已解锁 ${unlockedCount} / ${completedCount}。</p>
-      <div class="home-actions">
-        <button type="button" data-action="start-quiz">开始测试</button>
-        <button type="button" class="ghost-button" data-action="open-collection">我的图鉴</button>
+    <section class="home-screen" aria-label="猫BTI首页">
+      <header class="home-topbar">
+        <div class="brand-mark" aria-label="猫BTI">
+          <span class="brand-word">喵BTI</span>
+          <span class="brand-paw" aria-hidden="true"> paw </span>
+        </div>
+        <div class="top-actions" aria-hidden="true">
+          <span class="round-icon">✓</span>
+          <span class="round-icon cat-face">
+            <img src="./icon.png" alt="" />
+          </span>
+        </div>
+      </header>
+
+      <section class="panel hero-card">
+        <div class="hero-copy">
+          <p class="eyebrow">离线猫格测试</p>
+          <h1>测测今天的<br /><span>喵BTI</span></h1>
+          <p class="subtitle">24题轻松测试，发现你的猫猫人格！</p>
+          <div class="trait-row" aria-label="测试特点">
+            <span>有趣</span>
+            <span>治愈</span>
+            <span>准到喵叫</span>
+          </div>
+          <button type="button" class="primary-cta" data-action="start-quiz">
+            测测今天的喵BTI <span aria-hidden="true">›</span>
+          </button>
+        </div>
+        <div class="hero-art" aria-hidden="true">
+          <div class="speech-bubble">今天<br />你是什么<br />猫猫呢？</div>
+          <img src="./resources/personalities-main/16 可爱喵.png" alt="" />
+        </div>
+      </section>
+
+      <div class="home-feature-grid">
+        <button type="button" class="feature-card feature-yellow" data-action="open-collection">
+          <span class="feature-copy">
+            <strong>喵BTI图鉴</strong>
+            <small>${completedCount} 种猫格图鉴<br />已解锁 ${unlockedCount} / ${completedCount}</small>
+            <i aria-hidden="true">›</i>
+          </span>
+          <img src="./resources/personalities-main/05 打工猫.png" alt="" />
+        </button>
+
+        <button type="button" class="feature-card feature-peach" data-action="open-community">
+          <span class="feature-copy">
+            <strong>其他测试</strong>
+            <small>更多有趣测试<br />等你来探索</small>
+            <i aria-hidden="true">›</i>
+          </span>
+          <img src="./resources/personalities-main/04 学习猫.png" alt="" />
+        </button>
+
+        <button type="button" class="feature-card feature-mint" data-action="open-community">
+          <span class="feature-copy">
+            <strong>猫薄荷社区</strong>
+            <small>分享你的猫薄荷<br />发现同类的快乐</small>
+            <i aria-hidden="true">›</i>
+          </span>
+          <img src="./resources/personalities-main/16 可爱喵.png" alt="" />
+        </button>
+
+        <button type="button" class="feature-card feature-lilac" data-action="open-community">
+          <span class="feature-copy">
+            <strong>游戏广场</strong>
+            <small>玩小游戏<br />收获喵喵快乐</small>
+            <i aria-hidden="true">›</i>
+          </span>
+          <img src="./resources/personalities-main/03 我说我是猫.png" alt="" />
+        </button>
       </div>
-      <p class="footnote">结果仅供娱乐，请按心情吸猫。</p>
+
+      <section class="invite-card">
+        <div>
+          <h2>邀请好友一起测</h2>
+          <p>看看你和好友的猫猫人格合拍度吧！</p>
+          <button type="button" data-action="open-community">去邀请 <span aria-hidden="true">›</span></button>
+        </div>
+        <img src="./resources/personalities-main/11 权威猫.png" alt="" />
+      </section>
+
+      <nav class="bottom-tabbar" aria-label="首页导航">
+        <button type="button" class="is-active" data-action="go-home"><span>⌂</span>首页</button>
+        <button type="button" data-action="open-collection"><span>♡</span>图鉴</button>
+        <button type="button" class="test-tab" data-action="start-quiz"><span>●</span>测一测</button>
+        <button type="button" data-action="open-community"><span>♧</span>社区</button>
+        <button type="button" data-action="open-community"><span>♢</span>游戏</button>
+      </nav>
     </section>
   `;
 }
 
-export function renderQuizView({ index, total, question }) {
+function renderQuizView({ index, total, question }) {
   const optionsMarkup = question.options
     .map(
       (option) => `
@@ -40,7 +120,7 @@ export function renderQuizView({ index, total, question }) {
   `;
 }
 
-export function renderResultView({ result, auxiliaryText, resultImage }) {
+function renderResultView({ result, auxiliaryText, resultImage }) {
   const imageMarkup = resultImage
     ? `
       <figure class="result-image-card">
@@ -81,7 +161,7 @@ export function renderResultView({ result, auxiliaryText, resultImage }) {
   `;
 }
 
-export function renderCollectionView({ unlockedCount, totalCount, items }) {
+function renderCollectionView({ unlockedCount, totalCount, items }) {
   const cardsMarkup = items
     .map(
       (item) => `
@@ -126,7 +206,7 @@ export function renderCollectionView({ unlockedCount, totalCount, items }) {
   `;
 }
 
-export function renderCollectionDetailOverlay({ result, resultImage }) {
+function renderCollectionDetailOverlay({ result, resultImage }) {
   const imageMarkup = resultImage
     ? `
       <figure class="result-image-card">
@@ -156,7 +236,7 @@ export function renderCollectionDetailOverlay({ result, resultImage }) {
   `;
 }
 
-export function renderCollectionLockedOverlay() {
+function renderCollectionLockedOverlay() {
   return `
     <div class="overlay-backdrop" data-action="close-collection-locked">
       <section class="panel share-overlay" aria-label="图鉴未解锁提示">
@@ -171,7 +251,7 @@ export function renderCollectionLockedOverlay() {
   `;
 }
 
-export function renderCommunityOverlay() {
+function renderCommunityOverlay() {
   return `
     <div class="overlay-backdrop" data-action="close-community">
       <section class="panel share-overlay" aria-label="猫薄荷社区说明">
@@ -187,7 +267,7 @@ export function renderCommunityOverlay() {
   `;
 }
 
-export function renderShareOverlay({ resultName }) {
+function renderShareOverlay({ resultName }) {
   return `
     <div class="overlay-backdrop" data-action="close-share">
       <section class="panel share-overlay" aria-label="分享图预览">
@@ -206,7 +286,7 @@ export function renderShareOverlay({ resultName }) {
   `;
 }
 
-export function renderErrorView(message) {
+function renderErrorView(message) {
   return `
     <section class="panel error-card">
       <p class="eyebrow">猫爪打滑了</p>
@@ -215,3 +295,16 @@ export function renderErrorView(message) {
     </section>
   `;
 }
+
+Object.assign(MaoBTI, {
+  renderCollectionDetailOverlay,
+  renderCollectionLockedOverlay,
+  renderCollectionView,
+  renderCommunityOverlay,
+  renderErrorView,
+  renderHomeView,
+  renderQuizView,
+  renderResultView,
+  renderShareOverlay
+});
+})(globalThis);

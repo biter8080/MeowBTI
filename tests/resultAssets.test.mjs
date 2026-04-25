@@ -1,7 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { RESULTS } from "../js/data/content.js";
-import { getResultImagePath } from "../js/data/resultAssets.js";
+import { loadAppScripts } from "./helpers/loadAppScripts.mjs";
+
+const { RESULTS, getResultImagePath } = await loadAppScripts();
 
 test("every result resolves to a local meme image path", () => {
   const paths = RESULTS.map((item) => getResultImagePath(item));

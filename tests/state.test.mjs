@@ -1,6 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import {
+import { loadAppScripts } from "./helpers/loadAppScripts.mjs";
+
+const {
   createEmptyCollection,
   createInitialState,
   answerQuestion,
@@ -11,7 +13,7 @@ import {
   saveCollection,
   unlockResult,
   saveLastResult
-} from "../js/core/state.js";
+} = await loadAppScripts();
 
 const questionScoreMap = { A: 2, B: 1, C: -1, D: -2 };
 

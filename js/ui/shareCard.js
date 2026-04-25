@@ -1,3 +1,6 @@
+(function (global) {
+const MaoBTI = global.MaoBTI || (global.MaoBTI = {});
+
 function wrapText(text, maxCharsPerLine = 14) {
   const result = [];
   let start = 0;
@@ -10,7 +13,7 @@ function wrapText(text, maxCharsPerLine = 14) {
   return result;
 }
 
-export function buildShareCardModel({ result, auxiliaryText }) {
+function buildShareCardModel({ result, auxiliaryText }) {
   return {
     title: result.name,
     subtitle: result.tagline,
@@ -45,7 +48,7 @@ function fillRoundRect(ctx, x, y, width, height, radius) {
   ctx.fill();
 }
 
-export function drawShareCard(ctx, model, iconImage) {
+function drawShareCard(ctx, model, iconImage) {
   const { width, height } = ctx.canvas;
 
   ctx.clearRect(0, 0, width, height);
@@ -90,3 +93,6 @@ export function drawShareCard(ctx, model, iconImage) {
   ctx.font = "32px sans-serif";
   ctx.fillText("结果仅供娱乐，欢迎截图分享给朋友。", 120, height - 210);
 }
+
+Object.assign(MaoBTI, { buildShareCardModel, drawShareCard });
+})(globalThis);

@@ -1,10 +1,12 @@
+(function (global) {
+const MaoBTI = global.MaoBTI || (global.MaoBTI = {});
 const DIMENSIONS = ["S", "E", "A", "O", "D", "P"];
 
-export function createEmptyScores() {
+function createEmptyScores() {
   return Object.fromEntries(DIMENSIONS.map((key) => [key, 0]));
 }
 
-export function applyAnswer(scores, question) {
+function applyAnswer(scores, question) {
   const next = { ...scores };
   next[question.dimension] += question.scoreMap[question.optionKey];
   return next;
@@ -14,7 +16,7 @@ function axisSuffix(value) {
   return value >= 0 ? "+" : "-";
 }
 
-export function resolveTypeCode(scores) {
+function resolveTypeCode(scores) {
   return [
     `S${axisSuffix(scores.S)}`,
     `A${axisSuffix(scores.A)}`,
@@ -23,10 +25,19 @@ export function resolveTypeCode(scores) {
   ].join("");
 }
 
-export function resolveAuxiliaryCode(scores) {
+function resolveAuxiliaryCode(scores) {
   return `E${axisSuffix(scores.E)}P${axisSuffix(scores.P)}`;
 }
 
-export function resolveResultByType(results, typeCode) {
+function resolveResultByType(results, typeCode) {
   return results.find((item) => item.typeCode === typeCode) ?? null;
 }
+
+Object.assign(MaoBTI, {
+  applyAnswer,
+  createEmptyScores,
+  resolveAuxiliaryCode,
+  resolveResultByType,
+  resolveTypeCode
+});
+})(globalThis);

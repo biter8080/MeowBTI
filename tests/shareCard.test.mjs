@@ -1,6 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { buildShareCardModel } from "../js/ui/shareCard.js";
+import { loadAppScripts } from "./helpers/loadAppScripts.mjs";
+
+const { buildShareCardModel } = await loadAppScripts();
 
 test("buildShareCardModel returns share-safe lines and theme", () => {
   const model = buildShareCardModel({

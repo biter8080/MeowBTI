@@ -1,4 +1,7 @@
-export function startBackground(canvas) {
+(function (global) {
+const MaoBTI = global.MaoBTI || (global.MaoBTI = {});
+
+function startBackground(canvas) {
   const ctx = canvas.getContext("2d");
   if (!ctx) {
     return () => {};
@@ -75,3 +78,6 @@ export function startBackground(canvas) {
     window.removeEventListener("resize", resize);
   };
 }
+
+Object.assign(MaoBTI, { startBackground });
+})(globalThis);

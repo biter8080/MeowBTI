@@ -1,13 +1,15 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import {
+import { loadAppScripts } from "./helpers/loadAppScripts.mjs";
+
+const {
   createEmptyScores,
   applyAnswer,
   resolveTypeCode,
   resolveAuxiliaryCode,
-  resolveResultByType
-} from "../js/core/engine.js";
-import { RESULTS } from "../js/data/content.js";
+  resolveResultByType,
+  RESULTS
+} = await loadAppScripts();
 
 test("applyAnswer adds score to the targeted dimension", () => {
   const next = applyAnswer(createEmptyScores(), {

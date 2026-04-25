@@ -1,3 +1,6 @@
+(function (global) {
+const MaoBTI = global.MaoBTI || (global.MaoBTI = {});
+
 const DEFAULT_SCORE_MAP = { A: 2, B: 1, C: -1, D: -2 };
 
 function options(a, b, c, d) {
@@ -48,7 +51,7 @@ function result(
   };
 }
 
-export const QUESTIONS = [
+const QUESTIONS = [
   question(
     "Q1",
     "S",
@@ -339,7 +342,7 @@ export const QUESTIONS = [
   )
 ];
 
-export const RESULTS = [
+const RESULTS = [
   result(
     "01",
     "S+A+O+D+",
@@ -550,9 +553,12 @@ export const RESULTS = [
   )
 ];
 
-export const AUXILIARY_COPY = {
+const AUXILIARY_COPY = {
   "E+P+": "你不是没脾气，你只是平时懒得随便亮爪。",
   "E+P-": "你的情绪都写在脸上，累了也只想先躲起来缓缓。",
   "E-P+": "你看起来很稳，其实很多东西都被你默默扛住了。",
   "E-P-": "你习惯把情绪收好，等回到自己的窝里再慢慢处理。"
 };
+
+Object.assign(MaoBTI, { AUXILIARY_COPY, QUESTIONS, RESULTS });
+})(globalThis);

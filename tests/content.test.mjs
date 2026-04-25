@@ -1,6 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { QUESTIONS, RESULTS, AUXILIARY_COPY } from "../js/data/content.js";
+import { loadAppScripts } from "./helpers/loadAppScripts.mjs";
+
+const { QUESTIONS, RESULTS, AUXILIARY_COPY } = await loadAppScripts();
 
 test("QUESTIONS contains 24 prompts with unique ids", () => {
   assert.equal(QUESTIONS.length, 24);

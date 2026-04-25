@@ -1,6 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import {
+import { loadAppScripts } from "./helpers/loadAppScripts.mjs";
+
+const {
   renderCollectionDetailOverlay,
   renderCollectionLockedOverlay,
   renderCollectionView,
@@ -10,14 +12,14 @@ import {
   renderResultView,
   renderCommunityOverlay,
   renderShareOverlay
-} from "../js/ui/templates.js";
+} = await loadAppScripts();
 
 test("renderHomeView renders CTA and disclaimer copy", () => {
   const html = renderHomeView({ completedCount: 16, unlockedCount: 3 });
-  assert.match(html, /开始测试/);
-  assert.match(html, /我的图鉴/);
+  assert.match(html, /测测今天的喵BTI/);
+  assert.match(html, /喵BTI图鉴/);
   assert.match(html, /已解锁\s*3\s*\/\s*16/);
-  assert.match(html, /结果仅供娱乐/);
+  assert.match(html, /猫薄荷社区/);
   assert.match(html, /16\s*种猫格/);
 });
 

@@ -1,10 +1,11 @@
-import { applyAnswer, createEmptyScores } from "./engine.js";
-
+(function (global) {
+const MaoBTI = global.MaoBTI || (global.MaoBTI = {});
+const { applyAnswer, createEmptyScores } = MaoBTI;
 const STORAGE_KEY = "maobti.session";
 const LAST_RESULT_KEY = "maobti.lastResult";
 const COLLECTION_KEY = "maobti.collection";
 
-export function createInitialState() {
+function createInitialState() {
   return {
     currentQuestionIndex: 0,
     answers: {},
@@ -12,7 +13,7 @@ export function createInitialState() {
   };
 }
 
-export function createEmptyCollection() {
+function createEmptyCollection() {
   return {
     unlockedResultIds: []
   };
@@ -22,7 +23,7 @@ function getQuestionById(questions, questionId) {
   return questions.find((item) => item.id === questionId);
 }
 
-export function answerQuestion(state, questions, questionId, optionKey) {
+function answerQuestion(state, questions, questionId, optionKey) {
   const question = getQuestionById(questions, questionId);
   const nextScores = applyAnswer(state.scores, {
     dimension: question.dimension,
@@ -37,7 +38,7 @@ export function answerQuestion(state, questions, questionId, optionKey) {
   };
 }
 
-export function goBackOneQuestion(state, questions) {
+function goBackOneQuestion(state, questions) {
   const previousIndex = Math.max(0, state.currentQuestionIndex - 1);
   const previousQuestion = questions[previousIndex];
 
@@ -67,11 +68,11 @@ export function goBackOneQuestion(state, questions) {
   };
 }
 
-export function saveSession(storage, state) {
+function saveSession(storage, state) {
   storage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
 
-export function loadSession(storage) {
+function loadSession(storage) {
   try {
     const raw = storage.getItem(STORAGE_KEY);
     return raw ? JSON.parse(raw) : createInitialState();
@@ -80,11 +81,11 @@ export function loadSession(storage) {
   }
 }
 
-export function clearSession(storage) {
+function clearSession(storage) {
   storage.removeItem(STORAGE_KEY);
 }
 
-export function loadCollection(storage) {
+function loadCollection(storage) {
   try {
     const raw = storage.getItem(COLLECTION_KEY);
     if (!raw) {
@@ -104,7 +105,7 @@ export function loadCollection(storage) {
   }
 }
 
-export function saveCollection(storage, collection) {
+function saveCollection(storage, collection) {
   try {
     storage.setItem(COLLECTION_KEY, JSON.stringify(collection));
   } catch {
@@ -112,7 +113,7 @@ export function saveCollection(storage, collection) {
   }
 }
 
-export function unlockResult(collection, resultId) {
+function unlockResult(collection, resultId) {
   if (
     !resultId ||
     collection.unlockedResultIds.includes(resultId)
@@ -125,7 +126,7 @@ export function unlockResult(collection, resultId) {
   };
 }
 
-export function saveLastResult(storage, resultPayload) {
+function saveLastResult(storage, resultPayload) {
   try {
     storage.setItem(LAST_RESULT_KEY, JSON.stringify(resultPayload));
   } catch {
@@ -133,7 +134,7 @@ export function saveLastResult(storage, resultPayload) {
   }
 }
 
-export function loadLastResult(storage) {
+function loadLastResult(storage) {
   try {
     const raw = storage.getItem(LAST_RESULT_KEY);
     return raw ? JSON.parse(raw) : null;
@@ -141,3 +142,19 @@ export function loadLastResult(storage) {
     return null;
   }
 }
+
+Object.assign(MaoBTI, {
+  answerQuestion,
+  clearSession,
+  createEmptyCollection,
+  createInitialState,
+  goBackOneQuestion,
+  loadCollection,
+  loadLastResult,
+  loadSession,
+  saveCollection,
+  saveLastResult,
+  saveSession,
+  unlockResult
+});
+})(globalThis);

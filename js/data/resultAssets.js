@@ -1,3 +1,5 @@
+(function (global) {
+const MaoBTI = global.MaoBTI || (global.MaoBTI = {});
 const RESULT_IMAGE_MAP = {
   "01": "./resources/personalities-main/11 权威猫.png",
   "02": "./resources/personalities-main/05 打工猫.png",
@@ -17,6 +19,9 @@ const RESULT_IMAGE_MAP = {
   "16": "./resources/personalities-main/15 落汤喵.png"
 };
 
-export function getResultImagePath(result) {
+function getResultImagePath(result) {
   return RESULT_IMAGE_MAP[result?.id] ?? "";
 }
+
+Object.assign(MaoBTI, { getResultImagePath });
+})(globalThis);

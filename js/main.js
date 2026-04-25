@@ -1,43 +1,70 @@
-import { QUESTIONS, RESULTS, AUXILIARY_COPY } from "./data/content.js";
-import { getResultImagePath } from "./data/resultAssets.js";
-import {
-  resolveAuxiliaryCode,
-  resolveResultByType,
-  resolveTypeCode
-} from "./core/engine.js";
-import { startBackground } from "./ui/background.js";
-import {
+(function (global) {
+const {
+  AUXILIARY_COPY,
+  QUESTIONS,
+  RESULTS,
   answerQuestion,
+  buildShareCardModel,
   clearSession,
   createInitialState,
+  drawShareCard,
+  getResultImagePath,
   goBackOneQuestion,
   loadCollection,
   loadLastResult,
   loadSession,
-  saveCollection,
-  saveLastResult,
-  saveSession,
-  unlockResult
-} from "./core/state.js";
-import {
   renderCollectionDetailOverlay,
   renderCollectionLockedOverlay,
   renderCollectionView,
-  renderHomeView,
   renderCommunityOverlay,
   renderErrorView,
+  renderHomeView,
   renderQuizView,
   renderResultView,
-  renderShareOverlay
-} from "./ui/templates.js";
-import { buildShareCardModel, drawShareCard } from "./ui/shareCard.js";
+  renderShareOverlay,
+  resolveAuxiliaryCode,
+  resolveResultByType,
+  resolveTypeCode,
+  saveCollection,
+  saveLastResult,
+  saveSession,
+  startBackground,
+  unlockResult
+} = global.MaoBTI;
 
+function createMemoryStorage() {
+  const values = new Map();
+
+  return {
+    getItem: (key) => values.get(key) ?? null,
+    removeItem: (key) => {
+      values.delete(key);
+    },
+    setItem: (key, value) => {
+      values.set(key, String(value));
+    }
+  };
+}
+
+function getStorage() {
+  try {
+    const storage = global.localStorage;
+    const testKey = "maobti.storage-test";
+    storage.setItem(testKey, testKey);
+    storage.removeItem(testKey);
+    return storage;
+  } catch {
+    return createMemoryStorage();
+  }
+}
+
+const appStorage = getStorage();
 let mode = "home";
-let quizState = loadSession(window.localStorage);
+let quizState = loadSession(appStorage);
 let finalViewModel = null;
 let shareImageUrl = "";
-let cachedLastResult = loadLastResult(window.localStorage);
-let collectionState = loadCollection(window.localStorage);
+let cachedLastResult = loadLastResult(appStorage);
+let collectionState = loadCollection(appStorage);
 const hiddenResultImages = new Set();
 
 const app = document.querySelector("#app");
@@ -111,7 +138,7 @@ function ensureResultUnlocked(result) {
   const nextCollection = unlockResult(collectionState, result?.id);
   if (nextCollection !== collectionState) {
     collectionState = nextCollection;
-    saveCollection(window.localStorage, collectionState);
+    saveCollection(appStorage, collectionState);
   }
 }
 
@@ -157,7 +184,7 @@ function render() {
     auxiliaryCode: finalViewModel.auxiliaryCode,
     result: finalViewModel.result
   };
-  saveLastResult(window.localStorage, cachedLastResult);
+  saveLastResult(appStorage, cachedLastResult);
   app.innerHTML = renderResultView(finalViewModel);
 }
 
@@ -249,7 +276,7 @@ document.addEventListener("click", (event) => {
 
   if (target.dataset.action === "start-quiz") {
     quizState = createInitialState();
-    saveSession(window.localStorage, quizState);
+    saveSession(appStorage, quizState);
     cachedLastResult = null;
     shareImageUrl = "";
     mode = "quiz";
@@ -279,7 +306,7 @@ document.addEventListener("click", (event) => {
       question.id,
       target.dataset.optionKey
     );
-    saveSession(window.localStorage, quizState);
+    saveSession(appStorage, quizState);
     mode = quizState.currentQuestionIndex >= QUESTIONS.length ? "result" : "quiz";
     render();
     return;
@@ -287,14 +314,14 @@ document.addEventListener("click", (event) => {
 
   if (target.dataset.action === "go-back") {
     quizState = goBackOneQuestion(quizState, QUESTIONS);
-    saveSession(window.localStorage, quizState);
+    saveSession(appStorage, quizState);
     render();
     return;
   }
 
   if (target.dataset.action === "restart-quiz") {
     quizState = createInitialState();
-    clearSession(window.localStorage);
+    clearSession(appStorage);
     closeCommunityOverlay();
     closeShareOverlay();
     shareImageUrl = "";
@@ -410,3 +437,4 @@ try {
   console.error(error);
   renderError("哎呀，出错了，请重启试试吧~");
 }
+})(globalThis);
