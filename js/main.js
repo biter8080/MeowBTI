@@ -18,6 +18,7 @@ import {
 } from "./core/state.js";
 import {
   renderHomeView,
+  renderCommunityOverlay,
   renderErrorView,
   renderQuizView,
   renderResultView,
@@ -132,7 +133,14 @@ function renderError(message) {
 }
 
 function closeShareOverlay() {
-  const overlay = document.querySelector(".overlay-backdrop");
+  const overlay = document.querySelector(".overlay-backdrop[data-action='close-share']");
+  if (overlay) {
+    overlay.remove();
+  }
+}
+
+function closeCommunityOverlay() {
+  const overlay = document.querySelector(".overlay-backdrop[data-action='close-community']");
   if (overlay) {
     overlay.remove();
   }
@@ -161,6 +169,7 @@ function openShare() {
   const finish = (iconImage) => {
     drawShareCard(ctx, model, iconImage);
     shareImageUrl = shareCanvas.toDataURL("image/png");
+    closeCommunityOverlay();
     closeShareOverlay();
     document.body.insertAdjacentHTML(
       "beforeend",
@@ -221,6 +230,7 @@ document.addEventListener("click", (event) => {
   if (target.dataset.action === "restart-quiz") {
     quizState = createInitialState();
     clearSession(window.localStorage);
+    closeCommunityOverlay();
     closeShareOverlay();
     shareImageUrl = "";
     mode = "home";
@@ -233,6 +243,13 @@ document.addEventListener("click", (event) => {
     return;
   }
 
+  if (target.dataset.action === "open-community") {
+    closeShareOverlay();
+    closeCommunityOverlay();
+    document.body.insertAdjacentHTML("beforeend", renderCommunityOverlay());
+    return;
+  }
+
   if (target.dataset.action === "download-share" && shareImageUrl) {
     const fileName = `maobti-${finalViewModel?.result.name ?? "share"}.png`;
     triggerDownload(fileName, shareImageUrl);
@@ -241,6 +258,11 @@ document.addEventListener("click", (event) => {
 
   if (target.dataset.action === "close-share") {
     closeShareOverlay();
+    return;
+  }
+
+  if (target.dataset.action === "close-community") {
+    closeCommunityOverlay();
     return;
   }
 

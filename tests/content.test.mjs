@@ -13,6 +13,15 @@ test("RESULTS contains 16 type definitions with unique type codes", () => {
   assert.equal(new Set(RESULTS.map((item) => item.typeCode)).size, 16);
 });
 
+test("RESULTS shareText avoids repeating the resolved result name", () => {
+  assert.equal(RESULTS.length, 16);
+  assert.ok(RESULTS.every((item) => !item.shareText.includes(item.name)));
+  assert.equal(
+    RESULTS.find((item) => item.name === "命苦猫")?.shareText,
+    "系统比我朋友还懂我最近的状态。"
+  );
+});
+
 test("AUXILIARY_COPY exposes all four E/P combinations", () => {
   assert.deepEqual(Object.keys(AUXILIARY_COPY).sort(), [
     "E+P+",

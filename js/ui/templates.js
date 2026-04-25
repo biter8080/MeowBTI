@@ -69,9 +69,26 @@ export function renderResultView({ result, auxiliaryText, resultImage }) {
       </div>
       <div class="result-actions">
         <button type="button" data-action="open-share">生成分享图</button>
+        <button type="button" class="ghost-button" data-action="open-community">猫薄荷社区</button>
         <button type="button" class="ghost-button" data-action="restart-quiz">重新测试</button>
       </div>
     </section>
+  `;
+}
+
+export function renderCommunityOverlay() {
+  return `
+    <div class="overlay-backdrop" data-action="close-community">
+      <section class="panel share-overlay" aria-label="猫薄荷社区说明">
+        <p class="eyebrow">猫薄荷社区</p>
+        <h2>猫格同类出没区</h2>
+        <p class="subtitle">这里原本会放猫格梗图、碎碎念和同类出没现场。</p>
+        <p class="auxiliary">demo 阶段此功能尚未开发。</p>
+        <div class="result-actions">
+          <button type="button" data-action="close-community">我知道了</button>
+        </div>
+      </section>
+    </div>
   `;
 }
 

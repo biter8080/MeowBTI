@@ -5,6 +5,7 @@ import {
   renderErrorView,
   renderQuizView,
   renderResultView,
+  renderCommunityOverlay,
   renderShareOverlay
 } from "../js/ui/templates.js";
 
@@ -41,7 +42,7 @@ test("renderResultView includes result title, auxiliary copy and actions", () =>
       name: "打工猫",
       tagline: "嘴上想辞职，行动上最能扛",
       description: "你是那种一边喊累，一边把活默默做完的人。",
-      shareText: "测出来是打工猫，很合理。"
+      shareText: "很合理。"
     },
     auxiliaryText: "你看起来很稳，其实很多东西都被你默默扛住了。",
     resultImage: null
@@ -49,6 +50,7 @@ test("renderResultView includes result title, auxiliary copy and actions", () =>
 
   assert.match(html, /打工猫/);
   assert.match(html, /生成分享图/);
+  assert.match(html, /猫薄荷社区/);
   assert.match(html, /重新测试/);
 });
 
@@ -59,7 +61,7 @@ test("renderResultView places meme image before result title", () => {
       name: "学习猫",
       tagline: "认真生长、稳定进步的自律小猫",
       description: "你做事不一定最快，但通常很稳。",
-      shareText: "测出学习猫，合理，我的人生主线果然是默默升级。"
+      shareText: "合理，我的人生主线果然是默默升级。"
     },
     auxiliaryText: "你看起来很稳，其实很多东西都被你默默扛住了。",
     resultImage: {
@@ -80,13 +82,20 @@ test("renderResultView omits image card when result image is unavailable", () =>
       name: "学习猫",
       tagline: "认真生长、稳定进步的自律小猫",
       description: "你做事不一定最快，但通常很稳。",
-      shareText: "测出学习猫，合理，我的人生主线果然是默默升级。"
+      shareText: "合理，我的人生主线果然是默默升级。"
     },
     auxiliaryText: "你看起来很稳，其实很多东西都被你默默扛住了。",
     resultImage: null
   });
 
   assert.doesNotMatch(html, /result-image-card/);
+});
+
+test("renderCommunityOverlay explains the placeholder status", () => {
+  const html = renderCommunityOverlay();
+  assert.match(html, /猫薄荷社区/);
+  assert.match(html, /demo 阶段此功能尚未开发/);
+  assert.match(html, /我知道了/);
 });
 
 test("renderShareOverlay includes preview and download actions", () => {

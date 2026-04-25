@@ -9,9 +9,19 @@ import {
   saveLastResult
 } from "../js/core/state.js";
 
+const questionScoreMap = { A: 2, B: 1, C: -1, D: -2 };
+
 const questions = [
-  { id: "Q1", dimension: "S", scoreMap: { A: 2, B: 1, C: -1, D: -2 } },
-  { id: "Q2", dimension: "E", scoreMap: { A: 2, B: 1, C: -1, D: -2 } }
+  {
+    id: "Q1",
+    dimension: "S",
+    scoreMap: questionScoreMap
+  },
+  {
+    id: "Q2",
+    dimension: "E",
+    scoreMap: questionScoreMap
+  }
 ];
 
 test("answerQuestion records answer, updates score and advances index", () => {
