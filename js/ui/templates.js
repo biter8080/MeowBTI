@@ -3,9 +3,9 @@ const MaoBTI = global.MaoBTI || (global.MaoBTI = {});
 
 function renderHomeView({ completedCount, unlockedCount }) {
   return `
-    <section class="home-screen" aria-label="猫BTI首页">
+    <section class="home-screen" aria-label="喵BTI首页">
       <header class="home-topbar">
-        <div class="brand-mark" aria-label="猫BTI">
+        <div class="brand-mark" aria-label="喵BTI">
           <span class="brand-word">喵BTI</span>
           <span class="brand-paw" aria-hidden="true"> paw </span>
         </div>

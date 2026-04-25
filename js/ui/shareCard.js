@@ -69,7 +69,7 @@ function drawShareCard(ctx, model, iconImage) {
   fillRoundRect(ctx, 120, 240, 260, 84, 28);
   ctx.fillStyle = model.theme.ink;
   ctx.font = "bold 42px sans-serif";
-  ctx.fillText("猫BTI", 170, 295);
+  ctx.fillText("喵BTI", 170, 295);
 
   if (iconImage) {
     ctx.drawImage(iconImage, width - 380, 210, 220, 220);
