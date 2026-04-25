@@ -64,6 +64,9 @@ test("renderResultView includes result title, auxiliary copy and actions", () =>
   assert.match(html, /猫薄荷社区/);
   assert.match(html, /重新测试/);
   assert.match(html, /已收录进你的图鉴/);
+  assert.doesNotMatch(html, /result-hero/);
+  assert.doesNotMatch(html, /result-chip/);
+  assert.doesNotMatch(html, /share-line/);
 });
 
 test("renderResultView keeps the requested action order", () => {
@@ -151,7 +154,7 @@ test("renderCollectionView renders locked and unlocked catalog cards", () => {
     ]
   });
 
-  assert.match(html, /喵BTI图鉴/);
+  assert.match(html, /我的图鉴/);
   assert.match(html, /已解锁\s*1\s*\/\s*2/);
   assert.equal((html.match(/data-collection-id=/g) || []).length, 2);
   assert.match(html, /\?\?\?/);
