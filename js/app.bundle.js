@@ -661,11 +661,17 @@
   // js/core/state.js
   var STORAGE_KEY = "maobti.session";
   var LAST_RESULT_KEY = "maobti.lastResult";
+  var COLLECTION_KEY = "maobti.collection";
   function createInitialState() {
     return {
       currentQuestionIndex: 0,
       answers: {},
       scores: createEmptyScores()
+    };
+  }
+  function createEmptyCollection() {
+    return {
+      unlockedResultIds: []
     };
   }
   function getQuestionById(questions, questionId) {
@@ -720,6 +726,35 @@
   function clearSession(storage) {
     storage.removeItem(STORAGE_KEY);
   }
+  function loadCollection(storage) {
+    try {
+      const raw = storage.getItem(COLLECTION_KEY);
+      if (!raw) {
+        return createEmptyCollection();
+      }
+      const parsed = JSON.parse(raw);
+      const unlockedResultIds = Array.isArray(parsed?.unlockedResultIds) ? parsed.unlockedResultIds.filter((value) => typeof value === "string") : [];
+      return {
+        unlockedResultIds: [...new Set(unlockedResultIds)]
+      };
+    } catch {
+      return createEmptyCollection();
+    }
+  }
+  function saveCollection(storage, collection) {
+    try {
+      storage.setItem(COLLECTION_KEY, JSON.stringify(collection));
+    } catch {
+    }
+  }
+  function unlockResult(collection, resultId) {
+    if (!resultId || collection.unlockedResultIds.includes(resultId)) {
+      return collection;
+    }
+    return {
+      unlockedResultIds: [...collection.unlockedResultIds, resultId]
+    };
+  }
   function saveLastResult(storage, resultPayload) {
     try {
       storage.setItem(LAST_RESULT_KEY, JSON.stringify(resultPayload));
@@ -736,15 +771,18 @@
   }
 
   // js/ui/templates.js
-  function renderHomeView({ completedCount }) {
+  function renderHomeView({ completedCount, unlockedCount }) {
     return `
     <section class="panel home-card">
       <img class="brand-icon" src="./icon.png" alt="\u732BBTI" />
       <p class="eyebrow">\u79BB\u7EBF\u732B\u683C\u6D4B\u8BD5</p>
       <h1>\u6D4B\u4E00\u6D4B\u4F60\u662F\u54EA\u79CD\u732B\u732B\u4EBA\u683C</h1>
       <p class="subtitle">24\u9898\u8F7B\u6D4B\u8BD5\uFF0C\u7ED3\u679C\u4EC5\u4F9B\u5A31\u4E50\uFF0C\u4F46\u5F88\u9002\u5408\u622A\u56FE\u53D1\u670B\u53CB\u3002</p>
-      <p class="meta">\u5F53\u524D\u5DF2\u6574\u7406 ${completedCount} \u79CD\u732B\u683C\u7ED3\u679C\u5361\u3002</p>
-      <button type="button" data-action="start-quiz">\u5F00\u59CB\u6D4B\u8BD5</button>
+      <p class="meta">\u5F53\u524D\u5DF2\u6574\u7406 ${completedCount} \u79CD\u732B\u683C\u7ED3\u679C\u5361\uFF0C\u5DF2\u89E3\u9501 ${unlockedCount} / ${completedCount}\u3002</p>
+      <div class="home-actions">
+        <button type="button" data-action="start-quiz">\u5F00\u59CB\u6D4B\u8BD5</button>
+        <button type="button" class="ghost-button" data-action="open-collection">\u6211\u7684\u56FE\u9274</button>
+      </div>
       <p class="footnote">\u7ED3\u679C\u4EC5\u4F9B\u5A31\u4E50\uFF0C\u8BF7\u6309\u5FC3\u60C5\u5438\u732B\u3002</p>
     </section>
   `;
@@ -796,13 +834,92 @@
       <div class="result-copy-body">
         <p class="description">${result2.description}</p>
         <p class="auxiliary">${auxiliaryText}</p>
+        <p class="meta result-saved-note">\u5DF2\u6536\u5F55\u8FDB\u4F60\u7684\u56FE\u9274</p>
       </div>
       <div class="result-actions">
         <button type="button" data-action="open-share">\u751F\u6210\u5206\u4EAB\u56FE</button>
-        <button type="button" class="ghost-button" data-action="open-community">\u732B\u8584\u8377\u793E\u533A</button>
+        <button type="button" class="ghost-button" data-action="open-collection">\u6211\u7684\u56FE\u9274</button>
         <button type="button" class="ghost-button" data-action="restart-quiz">\u91CD\u65B0\u6D4B\u8BD5</button>
+        <button type="button" class="ghost-button" data-action="open-community">\u732B\u8584\u8377\u793E\u533A</button>
       </div>
     </section>
+  `;
+  }
+  function renderCollectionView({ unlockedCount, totalCount, items }) {
+    const cardsMarkup = items.map(
+      (item) => `
+        <button
+          type="button"
+          class="collection-entry ${item.unlocked ? "is-unlocked" : "is-locked"}"
+          data-collection-id="${item.id}"
+        >
+          ${item.unlocked && item.image ? `
+                <span class="collection-entry-media">
+                  <img
+                    class="collection-entry-image"
+                    data-result-id="${item.id}"
+                    src="${item.image.src}"
+                    alt="${item.image.alt}"
+                  />
+                </span>
+              ` : `
+                <span class="collection-entry-media collection-entry-placeholder" aria-hidden="true">
+                  ?
+                </span>
+              `}
+          <span class="collection-entry-name">${item.unlocked ? item.name : "???"}</span>
+        </button>
+      `
+    ).join("");
+    return `
+    <section class="panel collection-card">
+      <div class="progress-meta">
+        <span>\u6211\u7684\u56FE\u9274</span>
+        <button type="button" class="link-button" data-action="go-home">\u8FD4\u56DE\u9996\u9875</button>
+      </div>
+      <p class="meta">\u5DF2\u89E3\u9501 ${unlockedCount} / ${totalCount}</p>
+      <div class="collection-grid">${cardsMarkup}</div>
+    </section>
+  `;
+  }
+  function renderCollectionDetailOverlay({ result: result2, resultImage }) {
+    const imageMarkup = resultImage ? `
+      <figure class="result-image-card">
+        <img
+          class="result-image"
+          data-result-id="${result2.id}"
+          src="${resultImage.src}"
+          alt="${resultImage.alt}"
+        />
+      </figure>
+    ` : "";
+    return `
+    <div class="overlay-backdrop" data-action="close-collection-detail">
+      <section class="panel share-overlay" aria-label="\u56FE\u9274\u8BE6\u60C5">
+        <p class="eyebrow">\u56FE\u9274\u8BE6\u60C5</p>
+        ${imageMarkup}
+        <h2>${result2.name}</h2>
+        <p class="tagline">${result2.tagline}</p>
+        <p class="description">${result2.description}</p>
+        <div class="result-actions">
+          <button type="button" data-action="close-collection-detail">\u5173\u95ED</button>
+        </div>
+      </section>
+    </div>
+  `;
+  }
+  function renderCollectionLockedOverlay() {
+    return `
+    <div class="overlay-backdrop" data-action="close-collection-locked">
+      <section class="panel share-overlay" aria-label="\u56FE\u9274\u672A\u89E3\u9501\u63D0\u793A">
+        <p class="eyebrow">\u8FD8\u6CA1\u89E3\u9501</p>
+        <h2>\u8FD9\u53EA\u732B\u8FD8\u6CA1\u89E3\u9501</h2>
+        <p class="subtitle">\u518D\u591A\u6D4B\u51E0\u6B21\uFF0C\u628A\u65B0\u7684\u732B\u683C\u6536\u8FDB\u4F60\u7684\u56FE\u9274\u91CC\u5427\u3002</p>
+        <div class="result-actions">
+          <button type="button" data-action="close-collection-locked">\u6211\u77E5\u9053\u4E86</button>
+        </div>
+      </section>
+    </div>
   `;
   }
   function renderCommunityOverlay() {
@@ -932,6 +1049,7 @@
   var finalViewModel = null;
   var shareImageUrl = "";
   var cachedLastResult = loadLastResult(window.localStorage);
+  var collectionState = loadCollection(window.localStorage);
   var hiddenResultImages = /* @__PURE__ */ new Set();
   var app = document.querySelector("#app");
   var bgCanvas = document.querySelector("#bg-canvas");
@@ -977,12 +1095,30 @@
     }
     return cachedLastResult ? "result" : "home";
   }
+  function buildCollectionItems() {
+    return RESULTS.map((result2) => ({
+      id: result2.id,
+      name: result2.name,
+      unlocked: collectionState.unlockedResultIds.includes(result2.id),
+      image: buildResultImage(result2)
+    }));
+  }
+  function ensureResultUnlocked(result2) {
+    const nextCollection = unlockResult(collectionState, result2?.id);
+    if (nextCollection !== collectionState) {
+      collectionState = nextCollection;
+      saveCollection(window.localStorage, collectionState);
+    }
+  }
   function render() {
     if (!app) {
       return;
     }
     if (mode === "home") {
-      app.innerHTML = renderHomeView({ completedCount: RESULTS.length });
+      app.innerHTML = renderHomeView({
+        completedCount: RESULTS.length,
+        unlockedCount: collectionState.unlockedResultIds.length
+      });
       return;
     }
     if (mode === "quiz") {
@@ -997,7 +1133,16 @@
       });
       return;
     }
+    if (mode === "collection") {
+      app.innerHTML = renderCollectionView({
+        unlockedCount: collectionState.unlockedResultIds.length,
+        totalCount: RESULTS.length,
+        items: buildCollectionItems()
+      });
+      return;
+    }
     finalViewModel = computeResultViewModel();
+    ensureResultUnlocked(finalViewModel.result);
     cachedLastResult = {
       typeCode: finalViewModel.typeCode,
       auxiliaryCode: finalViewModel.auxiliaryCode,
@@ -1020,6 +1165,22 @@
   }
   function closeCommunityOverlay() {
     const overlay = document.querySelector(".overlay-backdrop[data-action='close-community']");
+    if (overlay) {
+      overlay.remove();
+    }
+  }
+  function closeCollectionDetailOverlay() {
+    const overlay = document.querySelector(
+      ".overlay-backdrop[data-action='close-collection-detail']"
+    );
+    if (overlay) {
+      overlay.remove();
+    }
+  }
+  function closeCollectionLockedOverlay() {
+    const overlay = document.querySelector(
+      ".overlay-backdrop[data-action='close-collection-locked']"
+    );
     if (overlay) {
       overlay.remove();
     }
@@ -1072,6 +1233,15 @@
       render();
       return;
     }
+    if (target.dataset.action === "open-collection") {
+      closeShareOverlay();
+      closeCommunityOverlay();
+      closeCollectionDetailOverlay();
+      closeCollectionLockedOverlay();
+      mode = "collection";
+      render();
+      return;
+    }
     if (target.dataset.optionKey) {
       const question2 = QUESTIONS[quizState.currentQuestionIndex];
       if (!question2) {
@@ -1104,6 +1274,15 @@
       render();
       return;
     }
+    if (target.dataset.action === "go-home") {
+      closeShareOverlay();
+      closeCommunityOverlay();
+      closeCollectionDetailOverlay();
+      closeCollectionLockedOverlay();
+      mode = "home";
+      render();
+      return;
+    }
     if (target.dataset.action === "open-share") {
       openShare();
       return;
@@ -1127,6 +1306,33 @@
       closeCommunityOverlay();
       return;
     }
+    if (target.dataset.collectionId) {
+      const resultId = target.dataset.collectionId;
+      const result2 = RESULTS.find((item) => item.id === resultId);
+      const isUnlocked = collectionState.unlockedResultIds.includes(resultId);
+      closeCollectionDetailOverlay();
+      closeCollectionLockedOverlay();
+      if (!result2 || !isUnlocked) {
+        document.body.insertAdjacentHTML("beforeend", renderCollectionLockedOverlay());
+        return;
+      }
+      document.body.insertAdjacentHTML(
+        "beforeend",
+        renderCollectionDetailOverlay({
+          result: result2,
+          resultImage: buildResultImage(result2)
+        })
+      );
+      return;
+    }
+    if (target.dataset.action === "close-collection-detail") {
+      closeCollectionDetailOverlay();
+      return;
+    }
+    if (target.dataset.action === "close-collection-locked") {
+      closeCollectionLockedOverlay();
+      return;
+    }
     if (target.dataset.action === "reload-app") {
       window.location.reload();
     }
@@ -1135,13 +1341,13 @@
     "error",
     (event) => {
       const target = event.target;
-      if (!(target instanceof HTMLImageElement) || !target.classList.contains("result-image")) {
+      if (!(target instanceof HTMLImageElement) || !target.classList.contains("result-image") && !target.classList.contains("collection-entry-image")) {
         return;
       }
       const resultId = target.dataset.resultId;
       if (resultId && !hiddenResultImages.has(resultId)) {
         hiddenResultImages.add(resultId);
-        if (mode === "result") {
+        if (mode === "result" || mode === "collection") {
           render();
         }
       }

@@ -1,6 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
+  renderCollectionDetailOverlay,
+  renderCollectionLockedOverlay,
+  renderCollectionView,
   renderHomeView,
   renderErrorView,
   renderQuizView,
@@ -10,8 +13,10 @@ import {
 } from "../js/ui/templates.js";
 
 test("renderHomeView renders CTA and disclaimer copy", () => {
-  const html = renderHomeView({ completedCount: 16 });
+  const html = renderHomeView({ completedCount: 16, unlockedCount: 3 });
   assert.match(html, /开始测试/);
+  assert.match(html, /我的图鉴/);
+  assert.match(html, /已解锁\s*3\s*\/\s*16/);
   assert.match(html, /结果仅供娱乐/);
   assert.match(html, /16\s*种猫格/);
 });
@@ -50,8 +55,28 @@ test("renderResultView includes result title, auxiliary copy and actions", () =>
 
   assert.match(html, /打工猫/);
   assert.match(html, /生成分享图/);
+  assert.match(html, /我的图鉴/);
   assert.match(html, /猫薄荷社区/);
   assert.match(html, /重新测试/);
+  assert.match(html, /已收录进你的图鉴/);
+});
+
+test("renderResultView keeps the requested action order", () => {
+  const html = renderResultView({
+    result: {
+      id: "02",
+      name: "打工猫",
+      tagline: "嘴上想辞职，行动上最能扛",
+      description: "你是那种一边喊累，一边把活默默做完的人。",
+      shareText: "很合理。"
+    },
+    auxiliaryText: "你看起来很稳，其实很多东西都被你默默扛住了。",
+    resultImage: null
+  });
+
+  assert.ok(html.indexOf("生成分享图") < html.indexOf("我的图鉴"));
+  assert.ok(html.indexOf("我的图鉴") < html.indexOf("重新测试"));
+  assert.ok(html.indexOf("重新测试") < html.indexOf("猫薄荷社区"));
 });
 
 test("renderResultView places meme image before result title", () => {
@@ -96,6 +121,64 @@ test("renderCommunityOverlay explains the placeholder status", () => {
   assert.match(html, /猫薄荷社区/);
   assert.match(html, /demo 阶段此功能尚未开发/);
   assert.match(html, /我知道了/);
+});
+
+test("renderCollectionView renders locked and unlocked catalog cards", () => {
+  const html = renderCollectionView({
+    unlockedCount: 1,
+    totalCount: 2,
+    items: [
+      {
+        id: "01",
+        name: "命苦猫",
+        unlocked: false,
+        image: null
+      },
+      {
+        id: "02",
+        name: "打工猫",
+        unlocked: true,
+        image: {
+          src: "./resources/personalities-main/05 打工猫.png",
+          alt: "打工猫 meme 图"
+        }
+      }
+    ]
+  });
+
+  assert.match(html, /我的图鉴/);
+  assert.match(html, /已解锁\s*1\s*\/\s*2/);
+  assert.equal((html.match(/data-collection-id=/g) || []).length, 2);
+  assert.match(html, /\?\?\?/);
+  assert.match(html, /打工猫/);
+});
+
+test("renderCollectionDetailOverlay prints unlocked result details", () => {
+  const html = renderCollectionDetailOverlay({
+    result: {
+      id: "02",
+      name: "打工猫",
+      tagline: "嘴上想辞职，行动上最能扛",
+      description: "你是那种一边喊累，一边把活默默做完的人。"
+    },
+    resultImage: {
+      src: "./resources/personalities-main/05 打工猫.png",
+      alt: "打工猫 meme 图"
+    }
+  });
+
+  assert.match(html, /图鉴详情/);
+  assert.match(html, /打工猫/);
+  assert.match(html, /嘴上想辞职/);
+  assert.match(html, /data-action="close-collection-detail"/);
+});
+
+test("renderCollectionLockedOverlay explains the locked state", () => {
+  const html = renderCollectionLockedOverlay();
+
+  assert.match(html, /还没解锁/);
+  assert.match(html, /这只猫还没解锁/);
+  assert.match(html, /data-action="close-collection-locked"/);
 });
 
 test("renderShareOverlay includes preview and download actions", () => {

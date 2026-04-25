@@ -11,12 +11,18 @@ import {
   clearSession,
   createInitialState,
   goBackOneQuestion,
+  loadCollection,
   loadLastResult,
   loadSession,
+  saveCollection,
   saveLastResult,
-  saveSession
+  saveSession,
+  unlockResult
 } from "./core/state.js";
 import {
+  renderCollectionDetailOverlay,
+  renderCollectionLockedOverlay,
+  renderCollectionView,
   renderHomeView,
   renderCommunityOverlay,
   renderErrorView,
@@ -31,6 +37,7 @@ let quizState = loadSession(window.localStorage);
 let finalViewModel = null;
 let shareImageUrl = "";
 let cachedLastResult = loadLastResult(window.localStorage);
+let collectionState = loadCollection(window.localStorage);
 const hiddenResultImages = new Set();
 
 const app = document.querySelector("#app");
@@ -91,13 +98,33 @@ function determineInitialMode() {
   return cachedLastResult ? "result" : "home";
 }
 
+function buildCollectionItems() {
+  return RESULTS.map((result) => ({
+    id: result.id,
+    name: result.name,
+    unlocked: collectionState.unlockedResultIds.includes(result.id),
+    image: buildResultImage(result)
+  }));
+}
+
+function ensureResultUnlocked(result) {
+  const nextCollection = unlockResult(collectionState, result?.id);
+  if (nextCollection !== collectionState) {
+    collectionState = nextCollection;
+    saveCollection(window.localStorage, collectionState);
+  }
+}
+
 function render() {
   if (!app) {
     return;
   }
 
   if (mode === "home") {
-    app.innerHTML = renderHomeView({ completedCount: RESULTS.length });
+    app.innerHTML = renderHomeView({
+      completedCount: RESULTS.length,
+      unlockedCount: collectionState.unlockedResultIds.length
+    });
     return;
   }
 
@@ -114,7 +141,17 @@ function render() {
     return;
   }
 
+  if (mode === "collection") {
+    app.innerHTML = renderCollectionView({
+      unlockedCount: collectionState.unlockedResultIds.length,
+      totalCount: RESULTS.length,
+      items: buildCollectionItems()
+    });
+    return;
+  }
+
   finalViewModel = computeResultViewModel();
+  ensureResultUnlocked(finalViewModel.result);
   cachedLastResult = {
     typeCode: finalViewModel.typeCode,
     auxiliaryCode: finalViewModel.auxiliaryCode,
@@ -141,6 +178,24 @@ function closeShareOverlay() {
 
 function closeCommunityOverlay() {
   const overlay = document.querySelector(".overlay-backdrop[data-action='close-community']");
+  if (overlay) {
+    overlay.remove();
+  }
+}
+
+function closeCollectionDetailOverlay() {
+  const overlay = document.querySelector(
+    ".overlay-backdrop[data-action='close-collection-detail']"
+  );
+  if (overlay) {
+    overlay.remove();
+  }
+}
+
+function closeCollectionLockedOverlay() {
+  const overlay = document.querySelector(
+    ".overlay-backdrop[data-action='close-collection-locked']"
+  );
   if (overlay) {
     overlay.remove();
   }
@@ -202,6 +257,16 @@ document.addEventListener("click", (event) => {
     return;
   }
 
+  if (target.dataset.action === "open-collection") {
+    closeShareOverlay();
+    closeCommunityOverlay();
+    closeCollectionDetailOverlay();
+    closeCollectionLockedOverlay();
+    mode = "collection";
+    render();
+    return;
+  }
+
   if (target.dataset.optionKey) {
     const question = QUESTIONS[quizState.currentQuestionIndex];
     if (!question) {
@@ -238,6 +303,16 @@ document.addEventListener("click", (event) => {
     return;
   }
 
+  if (target.dataset.action === "go-home") {
+    closeShareOverlay();
+    closeCommunityOverlay();
+    closeCollectionDetailOverlay();
+    closeCollectionLockedOverlay();
+    mode = "home";
+    render();
+    return;
+  }
+
   if (target.dataset.action === "open-share") {
     openShare();
     return;
@@ -266,6 +341,39 @@ document.addEventListener("click", (event) => {
     return;
   }
 
+  if (target.dataset.collectionId) {
+    const resultId = target.dataset.collectionId;
+    const result = RESULTS.find((item) => item.id === resultId);
+    const isUnlocked = collectionState.unlockedResultIds.includes(resultId);
+
+    closeCollectionDetailOverlay();
+    closeCollectionLockedOverlay();
+
+    if (!result || !isUnlocked) {
+      document.body.insertAdjacentHTML("beforeend", renderCollectionLockedOverlay());
+      return;
+    }
+
+    document.body.insertAdjacentHTML(
+      "beforeend",
+      renderCollectionDetailOverlay({
+        result,
+        resultImage: buildResultImage(result)
+      })
+    );
+    return;
+  }
+
+  if (target.dataset.action === "close-collection-detail") {
+    closeCollectionDetailOverlay();
+    return;
+  }
+
+  if (target.dataset.action === "close-collection-locked") {
+    closeCollectionLockedOverlay();
+    return;
+  }
+
   if (target.dataset.action === "reload-app") {
     window.location.reload();
   }
@@ -277,7 +385,8 @@ document.addEventListener(
     const target = event.target;
     if (
       !(target instanceof HTMLImageElement) ||
-      !target.classList.contains("result-image")
+      (!target.classList.contains("result-image") &&
+        !target.classList.contains("collection-entry-image"))
     ) {
       return;
     }
@@ -285,7 +394,7 @@ document.addEventListener(
     const resultId = target.dataset.resultId;
     if (resultId && !hiddenResultImages.has(resultId)) {
       hiddenResultImages.add(resultId);
-      if (mode === "result") {
+      if (mode === "result" || mode === "collection") {
         render();
       }
     }

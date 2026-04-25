@@ -2,12 +2,19 @@ import { applyAnswer, createEmptyScores } from "./engine.js";
 
 const STORAGE_KEY = "maobti.session";
 const LAST_RESULT_KEY = "maobti.lastResult";
+const COLLECTION_KEY = "maobti.collection";
 
 export function createInitialState() {
   return {
     currentQuestionIndex: 0,
     answers: {},
     scores: createEmptyScores()
+  };
+}
+
+export function createEmptyCollection() {
+  return {
+    unlockedResultIds: []
   };
 }
 
@@ -75,6 +82,47 @@ export function loadSession(storage) {
 
 export function clearSession(storage) {
   storage.removeItem(STORAGE_KEY);
+}
+
+export function loadCollection(storage) {
+  try {
+    const raw = storage.getItem(COLLECTION_KEY);
+    if (!raw) {
+      return createEmptyCollection();
+    }
+
+    const parsed = JSON.parse(raw);
+    const unlockedResultIds = Array.isArray(parsed?.unlockedResultIds)
+      ? parsed.unlockedResultIds.filter((value) => typeof value === "string")
+      : [];
+
+    return {
+      unlockedResultIds: [...new Set(unlockedResultIds)]
+    };
+  } catch {
+    return createEmptyCollection();
+  }
+}
+
+export function saveCollection(storage, collection) {
+  try {
+    storage.setItem(COLLECTION_KEY, JSON.stringify(collection));
+  } catch {
+    // Ignore storage failures and keep the core flow usable.
+  }
+}
+
+export function unlockResult(collection, resultId) {
+  if (
+    !resultId ||
+    collection.unlockedResultIds.includes(resultId)
+  ) {
+    return collection;
+  }
+
+  return {
+    unlockedResultIds: [...collection.unlockedResultIds, resultId]
+  };
 }
 
 export function saveLastResult(storage, resultPayload) {
