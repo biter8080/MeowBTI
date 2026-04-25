@@ -1,4 +1,5 @@
 import { QUESTIONS, RESULTS, AUXILIARY_COPY } from "./data/content.js";
+import { getResultImagePath } from "./data/resultAssets.js";
 import {
   resolveAuxiliaryCode,
   resolveResultByType,
@@ -29,12 +30,25 @@ let quizState = loadSession(window.localStorage);
 let finalViewModel = null;
 let shareImageUrl = "";
 let cachedLastResult = loadLastResult(window.localStorage);
+const hiddenResultImages = new Set();
 
 const app = document.querySelector("#app");
 const bgCanvas = document.querySelector("#bg-canvas");
 const shareCanvas = document.querySelector("#share-canvas");
 
 startBackground(bgCanvas);
+
+function buildResultImage(result) {
+  const src = getResultImagePath(result);
+  if (!src || hiddenResultImages.has(result?.id)) {
+    return null;
+  }
+
+  return {
+    src,
+    alt: `${result.name} meme 图`
+  };
+}
 
 function computeResultViewModel() {
   if (
@@ -46,7 +60,8 @@ function computeResultViewModel() {
       result: cachedLastResult.result,
       typeCode: cachedLastResult.typeCode,
       auxiliaryCode: cachedLastResult.auxiliaryCode,
-      auxiliaryText: AUXILIARY_COPY[cachedLastResult.auxiliaryCode] ?? ""
+      auxiliaryText: AUXILIARY_COPY[cachedLastResult.auxiliaryCode] ?? "",
+      resultImage: buildResultImage(cachedLastResult.result)
     };
   }
 
@@ -58,7 +73,8 @@ function computeResultViewModel() {
     result,
     typeCode,
     auxiliaryCode,
-    auxiliaryText: AUXILIARY_COPY[auxiliaryCode] ?? ""
+    auxiliaryText: AUXILIARY_COPY[auxiliaryCode] ?? "",
+    resultImage: buildResultImage(result)
   };
 }
 
@@ -232,6 +248,28 @@ document.addEventListener("click", (event) => {
     window.location.reload();
   }
 });
+
+document.addEventListener(
+  "error",
+  (event) => {
+    const target = event.target;
+    if (
+      !(target instanceof HTMLImageElement) ||
+      !target.classList.contains("result-image")
+    ) {
+      return;
+    }
+
+    const resultId = target.dataset.resultId;
+    if (resultId && !hiddenResultImages.has(resultId)) {
+      hiddenResultImages.add(resultId);
+      if (mode === "result") {
+        render();
+      }
+    }
+  },
+  true
+);
 
 mode = determineInitialMode();
 

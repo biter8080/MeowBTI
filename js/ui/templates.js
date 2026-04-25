@@ -37,18 +37,36 @@ export function renderQuizView({ index, total, question }) {
   `;
 }
 
-export function renderResultView({ result, auxiliaryText }) {
+export function renderResultView({ result, auxiliaryText, resultImage }) {
+  const imageMarkup = resultImage
+    ? `
+      <figure class="result-image-card">
+        <img
+          class="result-image"
+          data-result-id="${result.id}"
+          src="${resultImage.src}"
+          alt="${resultImage.alt}"
+        />
+      </figure>
+    `
+    : "";
+
   return `
-    <section class="panel result-card">
+    <section class="panel result-card result-card-flow">
       <p class="eyebrow">你的猫BTI结果是</p>
-      <h1>${result.name}</h1>
-      <p class="tagline">${result.tagline}</p>
+      ${imageMarkup}
+      <header class="result-copy-head">
+        <h1>${result.name}</h1>
+        <p class="tagline">${result.tagline}</p>
+      </header>
       <div class="result-hero">
         <div class="result-chip">${result.name}</div>
         <p class="share-line">${result.shareText}</p>
       </div>
-      <p class="description">${result.description}</p>
-      <p class="auxiliary">${auxiliaryText}</p>
+      <div class="result-copy-body">
+        <p class="description">${result.description}</p>
+        <p class="auxiliary">${auxiliaryText}</p>
+      </div>
       <div class="result-actions">
         <button type="button" data-action="open-share">生成分享图</button>
         <button type="button" class="ghost-button" data-action="restart-quiz">重新测试</button>

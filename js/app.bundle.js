@@ -541,6 +541,29 @@
     "E-P-": "\u4F60\u4E60\u60EF\u628A\u60C5\u7EEA\u6536\u597D\uFF0C\u7B49\u56DE\u5230\u81EA\u5DF1\u7684\u7A9D\u91CC\u518D\u6162\u6162\u5904\u7406\u3002"
   };
 
+  // js/data/resultAssets.js
+  var RESULT_IMAGE_MAP = {
+    "01": "./resources/personalities-main/11 \u6743\u5A01\u732B.png",
+    "02": "./resources/personalities-main/05 \u6253\u5DE5\u732B.png",
+    "03": "./resources/personalities-main/14 \u571F\u8C6A\u732B.png",
+    "04": "./resources/personalities-main/08 \u5DF4\u62FF\u62FF\u732B.png",
+    "05": "./resources/personalities-main/06 \u8D85\u7EA7\u65E0\u654C\u5B87\u5B99\u5927\u7F8E\u732B.png",
+    "06": "./resources/personalities-main/04 \u5B66\u4E60\u732B.png",
+    "07": "./resources/personalities-main/03 \u6211\u8BF4\u6211\u662F\u732B.png",
+    "08": "./resources/personalities-main/16 \u53EF\u7231\u55B5.png",
+    "09": "./resources/personalities-main/02 \u90AA\u6076\u94F6\u6E10\u5C42.png",
+    "10": "./resources/personalities-main/12 \u54C8\u6C14\u732B.png",
+    "11": "./resources/personalities-main/13 \u5632\u8BBD\u732B.png",
+    "12": "./resources/personalities-main/10 \u547D\u82E6\u732B.png",
+    "13": "./resources/personalities-main/01 \u897F\u683C\u739B\u732B.png",
+    "14": "./resources/personalities-main/07 \u5FF5\u5FF5\u53E8\u53E8\u6C14\u732B\u732B.png",
+    "15": "./resources/personalities-main/09 huh \u732B.png",
+    "16": "./resources/personalities-main/15 \u843D\u6C64\u55B5.png"
+  };
+  function getResultImagePath(result2) {
+    return RESULT_IMAGE_MAP[result2?.id] ?? "";
+  }
+
   // js/core/engine.js
   var DIMENSIONS = ["S", "E", "A", "O", "D", "P"];
   function createEmptyScores() {
@@ -747,18 +770,33 @@
     </section>
   `;
   }
-  function renderResultView({ result: result2, auxiliaryText }) {
+  function renderResultView({ result: result2, auxiliaryText, resultImage }) {
+    const imageMarkup = resultImage ? `
+      <figure class="result-image-card">
+        <img
+          class="result-image"
+          data-result-id="${result2.id}"
+          src="${resultImage.src}"
+          alt="${resultImage.alt}"
+        />
+      </figure>
+    ` : "";
     return `
-    <section class="panel result-card">
+    <section class="panel result-card result-card-flow">
       <p class="eyebrow">\u4F60\u7684\u732BBTI\u7ED3\u679C\u662F</p>
-      <h1>${result2.name}</h1>
-      <p class="tagline">${result2.tagline}</p>
+      ${imageMarkup}
+      <header class="result-copy-head">
+        <h1>${result2.name}</h1>
+        <p class="tagline">${result2.tagline}</p>
+      </header>
       <div class="result-hero">
         <div class="result-chip">${result2.name}</div>
         <p class="share-line">${result2.shareText}</p>
       </div>
-      <p class="description">${result2.description}</p>
-      <p class="auxiliary">${auxiliaryText}</p>
+      <div class="result-copy-body">
+        <p class="description">${result2.description}</p>
+        <p class="auxiliary">${auxiliaryText}</p>
+      </div>
       <div class="result-actions">
         <button type="button" data-action="open-share">\u751F\u6210\u5206\u4EAB\u56FE</button>
         <button type="button" class="ghost-button" data-action="restart-quiz">\u91CD\u65B0\u6D4B\u8BD5</button>
@@ -878,17 +916,29 @@
   var finalViewModel = null;
   var shareImageUrl = "";
   var cachedLastResult = loadLastResult(window.localStorage);
+  var hiddenResultImages = /* @__PURE__ */ new Set();
   var app = document.querySelector("#app");
   var bgCanvas = document.querySelector("#bg-canvas");
   var shareCanvas = document.querySelector("#share-canvas");
   startBackground(bgCanvas);
+  function buildResultImage(result2) {
+    const src = getResultImagePath(result2);
+    if (!src || hiddenResultImages.has(result2?.id)) {
+      return null;
+    }
+    return {
+      src,
+      alt: `${result2.name} meme \u56FE`
+    };
+  }
   function computeResultViewModel() {
     if (quizState.currentQuestionIndex === 0 && cachedLastResult?.result && cachedLastResult?.auxiliaryCode) {
       return {
         result: cachedLastResult.result,
         typeCode: cachedLastResult.typeCode,
         auxiliaryCode: cachedLastResult.auxiliaryCode,
-        auxiliaryText: AUXILIARY_COPY[cachedLastResult.auxiliaryCode] ?? ""
+        auxiliaryText: AUXILIARY_COPY[cachedLastResult.auxiliaryCode] ?? "",
+        resultImage: buildResultImage(cachedLastResult.result)
       };
     }
     const typeCode = resolveTypeCode(quizState.scores);
@@ -898,7 +948,8 @@
       result: result2,
       typeCode,
       auxiliaryCode,
-      auxiliaryText: AUXILIARY_COPY[auxiliaryCode] ?? ""
+      auxiliaryText: AUXILIARY_COPY[auxiliaryCode] ?? "",
+      resultImage: buildResultImage(result2)
     };
   }
   function determineInitialMode() {
@@ -1046,6 +1097,23 @@
       window.location.reload();
     }
   });
+  document.addEventListener(
+    "error",
+    (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLImageElement) || !target.classList.contains("result-image")) {
+        return;
+      }
+      const resultId = target.dataset.resultId;
+      if (resultId && !hiddenResultImages.has(resultId)) {
+        hiddenResultImages.add(resultId);
+        if (mode === "result") {
+          render();
+        }
+      }
+    },
+    true
+  );
   mode = determineInitialMode();
   try {
     render();

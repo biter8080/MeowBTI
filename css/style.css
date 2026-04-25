@@ -41,21 +41,21 @@ body {
 .app {
   position: relative;
   z-index: 1;
-  width: min(100vw, 480px);
+  width: min(100% - 24px, 42rem);
   min-height: 100dvh;
   margin: 0 auto;
-  padding: 20px 16px 32px;
+  padding: clamp(16px, 3vw, 32px) clamp(12px, 3vw, 28px) clamp(24px, 4vw, 40px);
 }
 
 .panel {
   background: var(--panel);
-  border-radius: 24px;
+  border-radius: clamp(20px, 2.6vw, 28px);
   box-shadow: var(--shadow);
   backdrop-filter: blur(10px);
 }
 
 .home-card {
-  padding: 28px 22px;
+  padding: clamp(18px, 3vw, 30px);
   text-align: center;
 }
 
@@ -63,12 +63,12 @@ body {
 .result-card,
 .error-card,
 .share-overlay {
-  padding: 24px 20px;
+  padding: clamp(18px, 3vw, 30px);
 }
 
 .brand-icon {
   display: block;
-  width: min(72vw, 300px);
+  width: min(62vw, 320px);
   margin: 0 auto 12px;
 }
 
@@ -82,7 +82,7 @@ body {
 
 h1 {
   margin: 0;
-  font-size: 32px;
+  font-size: clamp(1.9rem, 4vw, 2.8rem);
   line-height: 1.2;
 }
 
@@ -103,7 +103,7 @@ h1 {
 
 button {
   width: 100%;
-  min-height: 52px;
+  min-height: clamp(52px, 7vw, 62px);
   border: 0;
   border-radius: 16px;
   background: linear-gradient(90deg, var(--accent), var(--accent-deep));
@@ -136,7 +136,7 @@ button {
 
 h2 {
   margin: 18px 0 20px;
-  font-size: 24px;
+  font-size: clamp(1.35rem, 3vw, 2rem);
   line-height: 1.45;
 }
 
@@ -173,7 +173,7 @@ h2 {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 14px 16px;
+  padding: clamp(14px, 2.2vw, 18px) clamp(14px, 2.4vw, 20px);
   background: #fff;
   text-align: left;
 }
@@ -207,9 +207,14 @@ h2 {
   color: #8a5d2f;
 }
 
+.result-copy-head {
+  display: grid;
+  gap: 8px;
+}
+
 .result-hero {
-  margin: 18px 0;
-  padding: 18px;
+  margin: clamp(16px, 2.5vw, 22px) 0;
+  padding: clamp(16px, 2.6vw, 22px);
   border-radius: 20px;
   background: linear-gradient(135deg, rgba(255, 207, 69, 0.22), rgba(255, 167, 182, 0.2));
 }
@@ -220,6 +225,27 @@ h2 {
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.8);
   font-weight: 700;
+}
+
+.result-copy-body {
+  display: grid;
+  gap: 12px;
+}
+
+.result-image-card {
+  margin: clamp(14px, 2.5vw, 24px) 0;
+  border-radius: clamp(18px, 2.5vw, 28px);
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(62, 43, 31, 0.08);
+}
+
+.result-image {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: contain;
+  background: #fff7ea;
 }
 
 .result-actions {
@@ -256,17 +282,17 @@ h2 {
   height: auto;
 }
 
-@media (max-width: 375px) {
+@media (min-width: 700px) {
   .app {
-    padding-inline: 12px;
+    width: min(100% - 48px, 52rem);
   }
 
-  h1 {
-    font-size: 28px;
+  .result-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  h2 {
-    font-size: 21px;
+  .share-overlay {
+    width: min(100%, 640px);
   }
 }
 
