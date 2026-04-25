@@ -6,12 +6,15 @@ const {
   renderCollectionDetailOverlay,
   renderCollectionLockedOverlay,
   renderCollectionView,
+  renderCommunityView,
   renderHomeView,
   renderErrorView,
+  renderGameView,
   renderQuizView,
   renderResultView,
   renderCommunityOverlay,
-  renderShareOverlay
+  renderShareOverlay,
+  renderTestsView
 } = await loadAppScripts();
 
 test("renderHomeView renders CTA and disclaimer copy", () => {
@@ -148,11 +151,36 @@ test("renderCollectionView renders locked and unlocked catalog cards", () => {
     ]
   });
 
-  assert.match(html, /我的图鉴/);
+  assert.match(html, /喵BTI图鉴/);
   assert.match(html, /已解锁\s*1\s*\/\s*2/);
   assert.equal((html.match(/data-collection-id=/g) || []).length, 2);
   assert.match(html, /\?\?\?/);
   assert.match(html, /打工猫/);
+});
+
+test("renderTestsView renders demo test cards", () => {
+  const html = renderTestsView();
+
+  assert.match(html, /其他测试/);
+  assert.match(html, /你是哪种恋爱猫/);
+  assert.match(html, /开始测试/);
+  assert.match(html, /data-action="start-quiz"/);
+});
+
+test("renderCommunityView renders community placeholder page", () => {
+  const html = renderCommunityView();
+
+  assert.match(html, /猫薄荷社区/);
+  assert.match(html, /分享你的猫薄荷/);
+  assert.match(html, /同类推荐/);
+});
+
+test("renderGameView renders game placeholder page", () => {
+  const html = renderGameView();
+
+  assert.match(html, /游戏广场/);
+  assert.match(html, /小游戏入口占位/);
+  assert.match(html, /先去测一测/);
 });
 
 test("renderCollectionDetailOverlay prints unlocked result details", () => {

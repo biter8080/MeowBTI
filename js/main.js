@@ -17,11 +17,14 @@ const {
   renderCollectionLockedOverlay,
   renderCollectionView,
   renderCommunityOverlay,
+  renderCommunityView,
   renderErrorView,
+  renderGameView,
   renderHomeView,
   renderQuizView,
   renderResultView,
   renderShareOverlay,
+  renderTestsView,
   resolveAuxiliaryCode,
   resolveResultByType,
   resolveTypeCode,
@@ -177,6 +180,21 @@ function render() {
     return;
   }
 
+  if (mode === "tests") {
+    app.innerHTML = renderTestsView();
+    return;
+  }
+
+  if (mode === "community") {
+    app.innerHTML = renderCommunityView();
+    return;
+  }
+
+  if (mode === "game") {
+    app.innerHTML = renderGameView();
+    return;
+  }
+
   finalViewModel = computeResultViewModel();
   ensureResultUnlocked(finalViewModel.result);
   cachedLastResult = {
@@ -294,6 +312,26 @@ document.addEventListener("click", (event) => {
     return;
   }
 
+  if (target.dataset.action === "open-tests") {
+    closeShareOverlay();
+    closeCommunityOverlay();
+    closeCollectionDetailOverlay();
+    closeCollectionLockedOverlay();
+    mode = "tests";
+    render();
+    return;
+  }
+
+  if (target.dataset.action === "open-game") {
+    closeShareOverlay();
+    closeCommunityOverlay();
+    closeCollectionDetailOverlay();
+    closeCollectionLockedOverlay();
+    mode = "game";
+    render();
+    return;
+  }
+
   if (target.dataset.optionKey) {
     const question = QUESTIONS[quizState.currentQuestionIndex];
     if (!question) {
@@ -348,7 +386,10 @@ document.addEventListener("click", (event) => {
   if (target.dataset.action === "open-community") {
     closeShareOverlay();
     closeCommunityOverlay();
-    document.body.insertAdjacentHTML("beforeend", renderCommunityOverlay());
+    closeCollectionDetailOverlay();
+    closeCollectionLockedOverlay();
+    mode = "community";
+    render();
     return;
   }
 

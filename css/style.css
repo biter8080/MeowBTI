@@ -74,6 +74,63 @@ body {
   padding-bottom: 106px;
 }
 
+.page-screen {
+  display: grid;
+  gap: 14px;
+  padding-bottom: 106px;
+}
+
+.page-header {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 44px;
+  align-items: center;
+  gap: 8px;
+}
+
+.page-header h1 {
+  text-align: center;
+  font-size: clamp(1.15rem, 4.2vw, 1.45rem);
+}
+
+.icon-link {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  min-height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.72);
+  color: #3e2b1f;
+  font-size: 1.45rem;
+  box-shadow: none;
+}
+
+.category-pills {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 2px 0 4px;
+  scrollbar-width: none;
+}
+
+.category-pills::-webkit-scrollbar {
+  display: none;
+}
+
+.category-pills span {
+  flex: 0 0 auto;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.62);
+  color: #745436;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.category-pills .is-active {
+  background: #fff0c8;
+  color: #e79518;
+}
+
 .home-topbar {
   display: flex;
   align-items: center;
@@ -686,27 +743,30 @@ h2 {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
-  margin-top: 16px;
 }
 
 .collection-entry {
+  position: relative;
   display: grid;
-  gap: 10px;
+  gap: 8px;
   padding: 12px;
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.86);
+  min-height: 178px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #fff4d9, #fffaf0);
+  border: 1px solid rgba(255, 255, 255, 0.8);
   text-align: center;
+  overflow: hidden;
+  box-shadow: 0 10px 24px rgba(94, 61, 25, 0.09);
 }
 
 .collection-entry-media {
   display: grid;
   place-items: center;
   width: 100%;
-  aspect-ratio: 4 / 5;
-  border-radius: 18px;
+  aspect-ratio: 1.35;
+  border-radius: 16px;
   overflow: hidden;
-  background: rgba(255, 248, 236, 0.92);
-  border: 1px solid rgba(62, 43, 31, 0.08);
+  background: transparent;
 }
 
 .collection-entry-image {
@@ -714,19 +774,189 @@ h2 {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  background: #fff7ea;
+  background: transparent;
 }
 
 .collection-entry-placeholder {
+  background:
+    radial-gradient(circle at 50% 45%, rgba(90, 90, 90, 0.22), transparent 36%),
+    linear-gradient(135deg, #cfcfcf, #9f9f9f);
   color: #7b5b37;
   font-size: clamp(2rem, 9vw, 3rem);
   font-weight: 800;
 }
 
+.collection-entry-placeholder::before {
+  content: "🔒";
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.38);
+  color: #fff;
+  font-size: 1.6rem;
+}
+
 .collection-entry-name {
+  position: relative;
+  z-index: 1;
+  font-weight: 900;
   line-height: 1.5;
   overflow-wrap: anywhere;
   word-break: break-word;
+}
+
+.collection-progress {
+  position: relative;
+  display: grid;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.84);
+  color: #8a5d2f;
+  font-size: 13px;
+  font-weight: 800;
+  box-shadow: 0 10px 24px rgba(94, 61, 25, 0.08);
+  overflow: hidden;
+}
+
+.collection-progress i {
+  display: block;
+  height: 8px;
+  max-width: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-deep));
+}
+
+.test-list {
+  display: grid;
+  gap: 12px;
+}
+
+.test-list-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(105px, 32%);
+  gap: 10px;
+  align-items: center;
+  min-height: 150px;
+  padding: 14px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #fff6e5, #fffdf7);
+  border: 1px solid rgba(255, 255, 255, 0.82);
+  box-shadow: 0 10px 24px rgba(94, 61, 25, 0.09);
+}
+
+.test-list-card:nth-child(2n) {
+  background: linear-gradient(135deg, #f1f8eb, #fffdf7);
+}
+
+.test-list-card:nth-child(3n) {
+  background: linear-gradient(135deg, #ffeceb, #fffdf7);
+}
+
+.test-list-card h2,
+.page-placeholder h2,
+.demo-hero-card h2 {
+  margin: 8px 0 6px;
+  font-size: clamp(1.1rem, 4vw, 1.55rem);
+  line-height: 1.25;
+}
+
+.test-list-card p,
+.page-placeholder p,
+.demo-hero-card p {
+  margin: 0;
+  color: #6a4a2a;
+  line-height: 1.55;
+}
+
+.test-list-card img {
+  width: 100%;
+  max-height: 128px;
+  object-fit: contain;
+}
+
+.mini-tag {
+  display: inline-flex;
+  width: fit-content;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: #fff0c8;
+  color: #e79518;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.test-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 8px 0 10px;
+}
+
+.test-meta span {
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  color: #7b5b37;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.test-list-card button,
+.demo-hero-card button {
+  width: auto;
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  color: #fff;
+  font-size: 14px;
+}
+
+.page-placeholder,
+.demo-hero-card {
+  padding: clamp(20px, 5vw, 34px);
+  border-radius: 26px;
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: var(--shadow);
+}
+
+.demo-hero-card {
+  min-height: 420px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background:
+    radial-gradient(circle at 76% 32%, rgba(255, 207, 69, 0.26), transparent 10rem),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(255, 246, 232, 0.88));
+}
+
+.community-demo {
+  background:
+    radial-gradient(circle at 80% 24%, rgba(115, 176, 104, 0.24), transparent 11rem),
+    linear-gradient(135deg, #f0f8ec, #fffdf7);
+}
+
+.game-demo {
+  background:
+    radial-gradient(circle at 80% 24%, rgba(149, 113, 216, 0.24), transparent 11rem),
+    linear-gradient(135deg, #f0eafd, #fffdf7);
+}
+
+.demo-feed {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.demo-feed span {
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.7);
+  color: #6f4a23;
+  font-weight: 800;
 }
 
 .overlay-backdrop {
@@ -832,6 +1062,10 @@ h2 {
   .bottom-tabbar .test-tab {
     width: 66px;
     height: 66px;
+  }
+
+  .test-list-card {
+    grid-template-columns: minmax(0, 1fr) 94px;
   }
 }
 

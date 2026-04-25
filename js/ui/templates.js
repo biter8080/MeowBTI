@@ -1,6 +1,32 @@
 (function (global) {
 const MaoBTI = global.MaoBTI || (global.MaoBTI = {});
 
+function renderBottomTabbar(activeKey = "home") {
+  const items = [
+    ["home", "go-home", "⌂", "首页"],
+    ["collection", "open-collection", "♡", "图鉴"],
+    ["test", "start-quiz", "●", "测一测"],
+    ["community", "open-community", "♧", "社区"],
+    ["game", "open-game", "♢", "游戏"]
+  ];
+
+  return `
+    <nav class="bottom-tabbar" aria-label="底部导航">
+      ${items
+        .map(([key, action, icon, label]) => `
+          <button
+            type="button"
+            class="${key === activeKey ? "is-active" : ""} ${key === "test" ? "test-tab" : ""}"
+            data-action="${action}"
+          >
+            <span>${icon}</span>${label}
+          </button>
+        `)
+        .join("")}
+    </nav>
+  `;
+}
+
 function renderHomeView({ completedCount, unlockedCount }) {
   return `
     <section class="home-screen" aria-label="喵BTI首页">
@@ -47,7 +73,7 @@ function renderHomeView({ completedCount, unlockedCount }) {
           <img src="./resources/personalities-main/05 打工猫.png" alt="" />
         </button>
 
-        <button type="button" class="feature-card feature-peach" data-action="open-community">
+        <button type="button" class="feature-card feature-peach" data-action="open-tests">
           <span class="feature-copy">
             <strong>其他测试</strong>
             <small>更多有趣测试<br />等你来探索</small>
@@ -62,16 +88,16 @@ function renderHomeView({ completedCount, unlockedCount }) {
             <small>分享你的猫薄荷<br />发现同类的快乐</small>
             <i aria-hidden="true">›</i>
           </span>
-          <img src="./resources/personalities-main/16 可爱喵.png" alt="" />
+          <img src="./resources/personalities-main/03 我说我是猫.png" alt="" />
         </button>
 
-        <button type="button" class="feature-card feature-lilac" data-action="open-community">
+        <button type="button" class="feature-card feature-lilac" data-action="open-game">
           <span class="feature-copy">
             <strong>游戏广场</strong>
             <small>玩小游戏<br />收获喵喵快乐</small>
             <i aria-hidden="true">›</i>
           </span>
-          <img src="./resources/personalities-main/03 我说我是猫.png" alt="" />
+          <img src="./resources/personalities-main/12 哈气猫.png" alt="" />
         </button>
       </div>
 
@@ -84,13 +110,7 @@ function renderHomeView({ completedCount, unlockedCount }) {
         <img src="./resources/personalities-main/11 权威猫.png" alt="" />
       </section>
 
-      <nav class="bottom-tabbar" aria-label="首页导航">
-        <button type="button" class="is-active" data-action="go-home"><span>⌂</span>首页</button>
-        <button type="button" data-action="open-collection"><span>♡</span>图鉴</button>
-        <button type="button" class="test-tab" data-action="start-quiz"><span>●</span>测一测</button>
-        <button type="button" data-action="open-community"><span>♧</span>社区</button>
-        <button type="button" data-action="open-community"><span>♢</span>游戏</button>
-      </nav>
+      ${renderBottomTabbar("home")}
     </section>
   `;
 }
@@ -195,13 +215,115 @@ function renderCollectionView({ unlockedCount, totalCount, items }) {
     .join("");
 
   return `
-    <section class="panel collection-card">
-      <div class="progress-meta">
-        <span>我的图鉴</span>
-        <button type="button" class="link-button" data-action="go-home">返回首页</button>
+    <section class="page-screen collection-screen" aria-label="喵BTI图鉴">
+      <header class="page-header">
+        <button type="button" class="icon-link" data-action="go-home" aria-label="返回首页">‹</button>
+        <h1>喵BTI图鉴</h1>
+        <button type="button" class="icon-link" data-action="open-community" aria-label="筛选">⌯</button>
+      </header>
+      <div class="category-pills" aria-label="图鉴分类">
+        <span class="is-active">全部</span>
+        <span>我的</span>
+        <span>好友</span>
+        <span>未解锁</span>
       </div>
-      <p class="meta">已解锁 ${unlockedCount} / ${totalCount}</p>
       <div class="collection-grid">${cardsMarkup}</div>
+      <div class="collection-progress">
+        <span>图鉴进度：已解锁 ${unlockedCount} / ${totalCount}</span>
+        <i style="width:${totalCount ? (unlockedCount / totalCount) * 100 : 0}%"></i>
+      </div>
+      ${renderBottomTabbar("collection")}
+    </section>
+  `;
+}
+
+function renderTestsView() {
+  const tests = [
+    ["推荐", "恋爱", "你是哪种恋爱猫？", "测测你在恋爱中的真实状态", "./resources/personalities-main/16 可爱喵.png"],
+    ["性格", "生活", "你的性格像哪种猫？", "发现你独特的猫系人格", "./resources/personalities-main/05 打工猫.png"],
+    ["职场", "事业", "你是职场中的哪种猫？", "看看你在工作里的生存方式", "./resources/personalities-main/11 权威猫.png"],
+    ["生活", "治愈", "你有多佛系？", "测测你的躺平系猫格", "./resources/personalities-main/04 学习猫.png"]
+  ];
+
+  return `
+    <section class="page-screen tests-screen" aria-label="其他测试">
+      <header class="page-header">
+        <button type="button" class="icon-link" data-action="go-home" aria-label="返回首页">‹</button>
+        <h1>其他测试</h1>
+        <button type="button" class="icon-link" data-action="open-community" aria-label="更多">…</button>
+      </header>
+      <div class="category-pills" aria-label="测试分类">
+        <span class="is-active">推荐</span>
+        <span>性格</span>
+        <span>恋爱</span>
+        <span>生活</span>
+        <span>奇喵</span>
+      </div>
+      <div class="test-list">
+        ${tests.map(([tag, subtag, title, copy, image]) => `
+          <article class="test-list-card">
+            <div>
+              <span class="mini-tag">${tag}</span>
+              <h2>${title}</h2>
+              <p>${copy}</p>
+              <div class="test-meta">
+                <span>${subtag}</span>
+                <span>10题</span>
+                <span>热度 demo</span>
+              </div>
+              <button type="button" data-action="start-quiz">开始测试</button>
+            </div>
+            <img src="${image}" alt="" />
+          </article>
+        `).join("")}
+      </div>
+      <section class="page-placeholder">
+        <h2>其他测试</h2>
+        <p>更多趣味测试会在这里持续更新。</p>
+      </section>
+      ${renderBottomTabbar("test")}
+    </section>
+  `;
+}
+
+function renderCommunityView() {
+  return `
+    <section class="page-screen demo-page" aria-label="猫薄荷社区">
+      <header class="page-header">
+        <button type="button" class="icon-link" data-action="go-home" aria-label="返回首页">‹</button>
+        <h1>猫薄荷社区</h1>
+        <button type="button" class="icon-link" data-action="open-tests" aria-label="更多">…</button>
+      </header>
+      <section class="demo-hero-card community-demo">
+        <span class="mini-tag">demo</span>
+        <h2>分享你的猫薄荷</h2>
+        <p>这里会展示让同类猫猫产生共鸣的视频、内容推荐和好友动态。</p>
+        <div class="demo-feed">
+          <span>同类推荐</span>
+          <span>好友共鸣</span>
+          <span>猫格话题</span>
+        </div>
+      </section>
+      ${renderBottomTabbar("community")}
+    </section>
+  `;
+}
+
+function renderGameView() {
+  return `
+    <section class="page-screen demo-page" aria-label="游戏广场">
+      <header class="page-header">
+        <button type="button" class="icon-link" data-action="go-home" aria-label="返回首页">‹</button>
+        <h1>游戏广场</h1>
+        <button type="button" class="icon-link" data-action="open-tests" aria-label="更多">…</button>
+      </header>
+      <section class="demo-hero-card game-demo">
+        <span class="mini-tag">demo</span>
+        <h2>小游戏入口占位</h2>
+        <p>后续可以放猫爪反应、猫粮收集、好友合拍度等轻玩法。</p>
+        <button type="button" data-action="start-quiz">先去测一测</button>
+      </section>
+      ${renderBottomTabbar("game")}
     </section>
   `;
 }
@@ -301,10 +423,13 @@ Object.assign(MaoBTI, {
   renderCollectionLockedOverlay,
   renderCollectionView,
   renderCommunityOverlay,
+  renderCommunityView,
   renderErrorView,
+  renderGameView,
   renderHomeView,
   renderQuizView,
   renderResultView,
-  renderShareOverlay
+  renderShareOverlay,
+  renderTestsView
 });
 })(globalThis);
