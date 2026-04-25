@@ -1,0 +1,1056 @@
+(() => {
+  // js/data/content.js
+  var DEFAULT_SCORE_MAP = { A: 2, B: 1, C: -1, D: -2 };
+  function options(a, b, c, d) {
+    return [
+      { key: "A", text: a },
+      { key: "B", text: b },
+      { key: "C", text: c },
+      { key: "D", text: d }
+    ];
+  }
+  function question(id, dimension, prompt, optionList, themeTag) {
+    return {
+      id,
+      dimension,
+      prompt,
+      options: optionList,
+      scoreMap: { ...DEFAULT_SCORE_MAP },
+      themeTag
+    };
+  }
+  function result(id, typeCode, name, tagline, description, shareText, catnipText, collectionText, memeKey, accentColor, cardStyle) {
+    return {
+      id,
+      typeCode,
+      name,
+      tagline,
+      description,
+      shareText,
+      catnipText,
+      collectionText,
+      memeKey,
+      accentColor,
+      cardStyle
+    };
+  }
+  var QUESTIONS = [
+    question(
+      "Q1",
+      "S",
+      "\u8FDB\u5230\u4E00\u4E2A\u534A\u751F\u4E0D\u719F\u7684\u5C40\uFF0C\u4F60\u4E00\u822C\u662F\u7ACB\u523B\u5DE1\u89C6\u9886\u5730\uFF0C\u8FD8\u662F\u5148\u627E\u5730\u65B9\u7A9D\u7740\uFF1F",
+      options(
+        "\u76F4\u63A5\u878D\u8FDB\u53BB\uFF0C\u54EA\u91CC\u70ED\u95F9\u5F80\u54EA\u91CC\u53BB",
+        "\u5148\u548C\u4E00\u4E24\u4E2A\u4EBA\u804A\uFF0C\u719F\u4E86\u5C31\u81EA\u7136\u653E\u5F00",
+        "\u5148\u89C2\u5BDF\u6C14\u6C1B\uFF0C\u786E\u8BA4\u8212\u670D\u518D\u6162\u6162\u52A0\u5165",
+        "\u5148\u627E\u4E2A\u5B89\u5168\u89D2\u843D\uFF0C\u6CA1\u5FC5\u8981\u4E0D\u4F1A\u4E3B\u52A8\u8425\u4E1A"
+      ),
+      "social"
+    ),
+    question(
+      "Q2",
+      "S",
+      "\u9047\u5230\u4E00\u4E2A\u770B\u8D77\u6765\u8FD8\u633A\u987A\u773C\u7684\u65B0\u670B\u53CB\uFF0C\u4F60\u901A\u5E38\u4F1A\u600E\u4E48\u5F00\u5C40\uFF1F",
+      options(
+        "\u4E3B\u52A8\u642D\u8BDD\uFF0C\u60F3\u5230\u4EC0\u4E48\u5C31\u5148\u804A\u8D77\u6765",
+        "\u627E\u4E2A\u81EA\u7136\u7684\u8BDD\u9898\u5207\u8FDB\u53BB\uFF0C\u4E0D\u4F1A\u592A\u751F\u786C",
+        "\u7B49\u5BF9\u65B9\u5148\u5F00\u53E3\uFF0C\u518D\u51B3\u5B9A\u8981\u4E0D\u8981\u63A5",
+        "\u9ED8\u9ED8\u8BB0\u4F4F\u8FD9\u4E2A\u4EBA\uFF0C\u4F46\u77ED\u65F6\u95F4\u4E0D\u4F1A\u9760\u8FD1"
+      ),
+      "social"
+    ),
+    question(
+      "Q3",
+      "S",
+      "\u7FA4\u804A\u70ED\u95F9\u8D77\u6765\u7684\u65F6\u5019\uFF0C\u4F60\u66F4\u50CF\u54EA\u79CD\u732B\u7CFB\u7AD9\u4F4D\uFF1F",
+      options(
+        "\u6C14\u6C1B\u62C5\u5F53\uFF0C\u54EA\u6709\u6897\u5F80\u54EA\u51B2",
+        "\u6709\u673A\u4F1A\u5C31\u63A5\u4E24\u53E5\uFF0C\u72B6\u6001\u6765\u4E86\u4E5F\u4F1A\u5E26\u8282\u594F",
+        "\u5E38\u5E74\u6F5C\u6C34\uFF0C\u770B\u5F97\u6BD4\u8BF4\u5F97\u591A",
+        "\u5076\u5C14\u53D1\u4E00\u4E2A\u8868\u60C5\uFF0C\u8BC1\u660E\u81EA\u5DF1\u8FD8\u6D3B\u7740"
+      ),
+      "social"
+    ),
+    question(
+      "Q4",
+      "S",
+      "\u6709\u4EBA\u4E3B\u52A8\u6765\u548C\u4F60\u642D\u8BDD\u65F6\uFF0C\u4F60\u7B2C\u4E00\u53CD\u5E94\u66F4\u63A5\u8FD1\u201C\u5C3E\u5DF4\u7FD8\u8D77\u6765\u201D\u8FD8\u662F\u201C\u5148\u89C2\u5BDF\u4E24\u79D2\u201D\uFF1F",
+      options(
+        "\u5F88\u5F00\u5FC3\uFF0C\u7ACB\u523B\u8FDB\u5165\u804A\u5929\u6A21\u5F0F",
+        "\u4F1A\u56DE\u5E94\uFF0C\u800C\u4E14\u901A\u5E38\u804A\u7740\u804A\u7740\u5C31\u719F\u4E86",
+        "\u793C\u8C8C\u56DE\u5E94\uFF0C\u4F46\u5185\u5FC3\u5148\u8BC4\u4F30\u4E00\u4E0B",
+        "\u8868\u9762\u5E73\u9759\uFF0C\u5185\u5FC3\u5DF2\u7ECF\u60F3\u7ED3\u675F\u5BF9\u8BDD\u4E86"
+      ),
+      "social"
+    ),
+    question(
+      "Q5",
+      "E",
+      "\u5FC3\u60C5\u4E00\u5DEE\uFF0C\u4F60\u901A\u5E38\u662F\u5F53\u573A\u6709\u70B9\u70B8\u6BDB\uFF0C\u8FD8\u662F\u8868\u9762\u65E0\u4E8B\u53D1\u751F\uFF1F",
+      options(
+        "\u5F88\u96BE\u85CF\u4F4F\uFF0C\u60C5\u7EEA\u57FA\u672C\u5199\u5728\u8138\u4E0A",
+        "\u4F1A\u8868\u73B0\u51FA\u6765\u4E00\u70B9\uFF0C\u4F46\u8FD8\u80FD\u63A7\u5236",
+        "\u5C3D\u91CF\u7EF4\u6301\u6B63\u5E38\uFF0C\u4E0D\u592A\u60F3\u8BA9\u4EBA\u770B\u89C1",
+        "\u5B8C\u5168\u6536\u8D77\u6765\uFF0C\u4E60\u60EF\u81EA\u5DF1\u6162\u6162\u6D88\u5316"
+      ),
+      "emotion"
+    ),
+    question(
+      "Q6",
+      "E",
+      "\u9047\u5230\u5F00\u5FC3\u4E8B\u65F6\uFF0C\u4F60\u662F\u90A3\u79CD\u4F1A\u539F\u5730\u6253\u6EDA\u5206\u4EAB\u7684\u4EBA\uFF0C\u8FD8\u662F\u81EA\u5DF1\u5077\u5077\u723D\u4E00\u4E0B\uFF1F",
+      options(
+        "\u7ACB\u523B\u5206\u4EAB\uFF0C\u6068\u4E0D\u5F97\u662D\u544A\u5929\u4E0B",
+        "\u4F1A\u544A\u8BC9\u719F\u4EBA\uFF0C\u5F00\u5FC3\u8981\u6709\u4EBA\u61C2",
+        "\u53EA\u5728\u5FC3\u91CC\u9AD8\u5174\uFF0C\u672A\u5FC5\u4F1A\u8BF4\u51FA\u6765",
+        "\u8868\u9762\u6DE1\u5B9A\uFF0C\u4E3B\u6253\u4E00\u4E2A\u5077\u5077\u723D"
+      ),
+      "emotion"
+    ),
+    question(
+      "Q7",
+      "E",
+      "\u5BF9\u4E00\u4EF6\u4E8B\u4E0D\u723D\u65F6\uFF0C\u4F60\u66F4\u50CF\u76F4\u63A5\u7529\u5C3E\u5DF4\uFF0C\u8FD8\u662F\u56DE\u53BB\u6162\u6162\u6D88\u5316\uFF1F",
+      options(
+        "\u4E0D\u723D\u5C31\u8BF4\uFF0C\u4E0D\u7136\u4F1A\u618B\u5F97\u66F4\u96BE\u53D7",
+        "\u4F1A\u59D4\u5A49\u8868\u8FBE\uFF0C\u4F46\u8FD8\u662F\u60F3\u8BA9\u4EBA\u77E5\u9053",
+        "\u5148\u5FCD\u4E00\u4E0B\uFF0C\u4E4B\u540E\u518D\u627E\u673A\u4F1A\u5904\u7406",
+        "\u4E0D\u592A\u8BF4\uFF0C\u901A\u5E38\u81EA\u5DF1\u625B\u8FC7\u53BB"
+      ),
+      "emotion"
+    ),
+    question(
+      "Q8",
+      "E",
+      "\u88AB\u8BEF\u4F1A\u4E4B\u540E\uFF0C\u4F60\u4F1A\u7ACB\u523B\u89E3\u91CA\u6E05\u695A\uFF0C\u8FD8\u662F\u5148\u628A\u59D4\u5C48\u63E3\u56DE\u7A9D\u91CC\uFF1F",
+      options(
+        "\u5F53\u573A\u89E3\u91CA\uFF0C\u6211\u53D7\u4E0D\u4E86\u88AB\u8BEF\u89E3",
+        "\u4F1A\u89E3\u91CA\uFF0C\u4F46\u5C3D\u91CF\u8BA9\u573A\u9762\u522B\u592A\u50F5",
+        "\u5148\u7F13\u4E00\u4E0B\uFF0C\u7B49\u60C5\u7EEA\u8FC7\u53BB\u518D\u8BF4",
+        "\u7B97\u4E86\uFF0C\u8BEF\u4F1A\u5C31\u8BEF\u4F1A\u5427\uFF0C\u61D2\u5F97\u5C55\u5F00"
+      ),
+      "emotion"
+    ),
+    question(
+      "Q9",
+      "A",
+      "\u65B0\u673A\u4F1A\u7A81\u7136\u6389\u5230\u9762\u524D\uFF0C\u4F60\u901A\u5E38\u4F1A\u76F4\u63A5\u6251\u4E0A\u53BB\uFF0C\u8FD8\u662F\u5148\u7ED5\u7740\u95FB\u4E24\u5708\uFF1F",
+      options(
+        "\u5148\u51B2\u4E86\u518D\u8BF4\uFF0C\u8FB9\u505A\u8FB9\u770B",
+        "\u5FEB\u901F\u5224\u65AD\u4E00\u4E0B\uFF0C\u89C9\u5F97\u884C\u5C31\u4E0A",
+        "\u4F1A\u8BA4\u771F\u89C2\u5BDF\uFF0C\u518D\u51B3\u5B9A\u503C\u4E0D\u503C\u5F97\u52A8",
+        "\u9664\u975E\u5F88\u786E\u5B9A\uFF0C\u4E0D\u7136\u4E00\u822C\u4E0D\u4F1A\u8D38\u7136\u51FA\u624B"
+      ),
+      "action"
+    ),
+    question(
+      "Q10",
+      "A",
+      "\u9762\u5BF9\u6CA1\u505A\u8FC7\u7684\u65B0\u4E1C\u897F\uFF0C\u4F60\u66F4\u50CF\u201C\u5148\u4E0A\u518D\u8BF4\u201D\u8FD8\u662F\u201C\u5148\u7814\u7A76\u5730\u5F62\u201D\uFF1F",
+      options(
+        "\u76F4\u63A5\u8BD5\uFF0C\u5F88\u591A\u4E8B\u505A\u4E86\u624D\u77E5\u9053",
+        "\u5148\u770B\u4E2A\u5927\u6982\uFF0C\u7136\u540E\u8FB9\u8BD5\u8FB9\u5B66",
+        "\u5148\u505A\u529F\u8BFE\uFF0C\u5FC3\u91CC\u6709\u5E95\u624D\u8212\u670D",
+        "\u4F1A\u62D6\u4E00\u4F1A\u513F\uFF0C\u6700\u597D\u7B49\u522B\u4EBA\u5148\u8E29\u8FC7\u5751"
+      ),
+      "action"
+    ),
+    question(
+      "Q11",
+      "A",
+      "\u8BA1\u5212\u4E34\u65F6\u53D8\u52A8\u65F6\uFF0C\u4F60\u662F\u9A6C\u4E0A\u5207\u6362\u9891\u9053\uFF0C\u8FD8\u662F\u4F1A\u5148\u5361\u987F\u4E00\u4E0B\uFF1F",
+      options(
+        "\u53D8\u5C31\u53D8\uFF0C\u6211\u9002\u5E94\u5F97\u5F88\u5FEB",
+        "\u4F1A\u6709\u70B9\u4E0D\u723D\uFF0C\u4F46\u5F88\u5FEB\u80FD\u63A5\u4E0A",
+        "\u9700\u8981\u4E00\u70B9\u65F6\u95F4\u91CD\u65B0\u6574\u7406\u72B6\u6001",
+        "\u4F1A\u660E\u663E\u88AB\u6253\u4E71\uFF0C\u6574\u4E2A\u4EBA\u90FD\u4E0D\u592A\u5BF9\u52B2"
+      ),
+      "action"
+    ),
+    question(
+      "Q12",
+      "A",
+      "\u522B\u4EBA\u90FD\u5DF2\u7ECF\u51B2\u51FA\u53BB\u884C\u52A8\u4E86\uFF0C\u4F60\u901A\u5E38\u662F\u8DDF\u4E0A\u3001\u89C2\u5BDF\uFF0C\u8FD8\u662F\u7EE7\u7EED\u6309\u81EA\u5DF1\u7684\u8282\u594F\u8214\u722A\u5B50\uFF1F",
+      options(
+        "\u5148\u8DDF\u4E0A\uFF0C\u8FB9\u8D70\u8FB9\u770B\u4E5F\u884C",
+        "\u5982\u679C\u65B9\u5411\u9760\u8C31\uFF0C\u6211\u4F1A\u5F88\u5FEB\u52A0\u5165",
+        "\u6211\u66F4\u4E60\u60EF\u770B\u6E05\u695A\u540E\u518D\u52A8",
+        "\u4E0D\u4F1A\u88AB\u5E26\u7740\u8DD1\uFF0C\u6211\u6709\u81EA\u5DF1\u7684\u8282\u594F"
+      ),
+      "action"
+    ),
+    question(
+      "Q13",
+      "O",
+      "\u4F60\u66F4\u559C\u6B22\u54EA\u79CD\u751F\u6D3B\u72B6\u6001\uFF1A\u50CF\u5DE1\u89C6\u5730\u76D8\u4E00\u6837\u6709\u79E9\u5E8F\uFF0C\u8FD8\u662F\u968F\u8D70\u968F\u505C\u770B\u5FC3\u60C5\uFF1F",
+      options(
+        "\u8D8A\u6709\u89C4\u5212\u8D8A\u5B89\u5FC3\uFF0C\u6211\u559C\u6B22\u4E8B\u60C5\u53EF\u63A7",
+        "\u5927\u65B9\u5411\u6709\u5B89\u6392\uFF0C\u7EC6\u8282\u53EF\u4EE5\u5F39\u6027\u4E00\u70B9",
+        "\u4E0D\u60F3\u6392\u592A\u6EE1\uFF0C\u7559\u70B9\u968F\u673A\u7A7A\u95F4\u66F4\u8212\u670D",
+        "\u770B\u5FC3\u60C5\u6D3B\u7740\uFF0C\u5F88\u591A\u4E8B\u4E34\u573A\u51B3\u5B9A\u5C31\u884C"
+      ),
+      "order"
+    ),
+    question(
+      "Q14",
+      "O",
+      "\u91CD\u8981\u4E8B\u60C5\u5F00\u59CB\u524D\uFF0C\u4F60\u4F1A\u628A\u732B\u7A9D\u94FA\u597D\u518D\u4E0A\uFF0C\u8FD8\u662F\u8FB9\u505A\u8FB9\u8C03\u6574\uFF1F",
+      options(
+        "\u4E00\u5B9A\u5148\u51C6\u5907\u9F50\u5168\uFF0C\u4E0D\u7136\u5FC3\u91CC\u4E0D\u8E0F\u5B9E",
+        "\u4F1A\u63D0\u524D\u51C6\u5907\u5927\u90E8\u5206\uFF0C\u7559\u4E00\u70B9\u673A\u52A8\u7A7A\u95F4",
+        "\u6709\u4E2A\u5927\u6982\u5C31\u884C\uFF0C\u5F00\u59CB\u6BD4\u5B8C\u7F8E\u66F4\u91CD\u8981",
+        "\u57FA\u672C\u662F\u505A\u5230\u54EA\u7B97\u54EA\uFF0C\u73B0\u573A\u53D1\u6325\u578B"
+      ),
+      "order"
+    ),
+    question(
+      "Q15",
+      "O",
+      "\u522B\u4EBA\u7A81\u7136\u6253\u4E71\u4F60\u7684\u5B89\u6392\u65F6\uFF0C\u4F60\u5185\u5FC3\u66F4\u50CF\u201C\u8C01\u52A8\u4E86\u6211\u7684\u7EB8\u7BB1\u201D\u8FD8\u662F\u201C\u7B97\u4E86\u4E5F\u884C\u201D\uFF1F",
+      options(
+        "\u4F1A\u5F88\u4E0D\u723D\uFF0C\u6211\u4E0D\u559C\u6B22\u8282\u594F\u88AB\u6253\u65AD",
+        "\u6709\u70B9\u4ECB\u610F\uFF0C\u4F46\u8FD8\u80FD\u8C03\u6574",
+        "\u770B\u60C5\u51B5\uFF0C\u5408\u7406\u7684\u8BDD\u53EF\u4EE5\u63A5\u53D7",
+        "\u6CA1\u4EC0\u4E48\u6240\u8C13\uFF0C\u6211\u672C\u6765\u5C31\u5F88\u968F\u673A"
+      ),
+      "order"
+    ),
+    question(
+      "Q16",
+      "O",
+      "\u5BF9\u81EA\u5DF1\u7684\u65F6\u95F4\u3001\u7A7A\u95F4\u548C\u4E60\u60EF\uFF0C\u4F60\u4F1A\u6709\u79CD\u201C\u8FD9\u91CC\u662F\u6211\u7684\u9886\u5730\u201D\u7684\u611F\u89C9\u5417\uFF1F",
+      options(
+        "\u5F88\u5F3A\uFF0C\u6211\u5BF9\u8FB9\u754C\u8FD9\u4EF6\u4E8B\u5F88\u8BA4\u771F",
+        "\u6709\uFF0C\u4F46\u53EA\u5BF9\u91CD\u8981\u7684\u90E8\u5206\u7279\u522B\u5728\u610F",
+        "\u8FD8\u597D\uFF0C\u4E0D\u592A\u4F1A\u7279\u522B\u5F3A\u8C03\u8FD9\u4E9B",
+        "\u8FB9\u754C\u611F\u6BD4\u8F83\u968F\u7F18\uFF0C\u600E\u4E48\u65B9\u4FBF\u600E\u4E48\u6765"
+      ),
+      "order"
+    ),
+    question(
+      "Q17",
+      "D",
+      "\u4ECA\u5929\u72B6\u6001\u7279\u522B\u597D\u65F6\uFF0C\u4F60\u66F4\u50CF\u4F1A\u4E3B\u52A8\u53BB\u7A97\u8FB9\u6652\u81EA\u5DF1\uFF0C\u8FD8\u662F\u9ED8\u9ED8\u89C9\u5F97\u81EA\u5DF1\u771F\u4E0D\u9519\uFF1F",
+      options(
+        "\u4F1A\u4E3B\u52A8\u5C55\u793A\uFF0C\u597D\u72B6\u6001\u5C31\u8BE5\u88AB\u770B\u89C1",
+        "\u4E0D\u523B\u610F\uFF0C\u4F46\u6709\u4EBA\u6CE8\u610F\u5230\u4E5F\u633A\u5F00\u5FC3",
+        "\u81EA\u5DF1\u77E5\u9053\u5C31\u591F\u4E86\uFF0C\u4E0D\u4E00\u5B9A\u60F3\u8868\u73B0",
+        "\u8D8A\u88AB\u5173\u6CE8\u8D8A\u4E0D\u81EA\u5728\uFF0C\u6211\u66F4\u60F3\u4F4E\u8C03\u70B9"
+      ),
+      "display"
+    ),
+    question(
+      "Q18",
+      "D",
+      "\u88AB\u5938\u7684\u65F6\u5019\uFF0C\u4F60\u901A\u5E38\u662F\u201C\u8FD9\u4F60\u90FD\u770B\u51FA\u6765\u4E86\u201D\uFF0C\u8FD8\u662F\u201C\u522B\u5938\u4E86\u6211\u8981\u94BB\u684C\u5E95\u4E86\u201D\uFF1F",
+      options(
+        "\u5F88\u81EA\u7136\u63A5\u4F4F\uFF0C\u751A\u81F3\u8FD8\u80FD\u987A\u52BF\u52A0\u4E00\u53E5",
+        "\u4F1A\u5F00\u5FC3\uFF0C\u4E5F\u613F\u610F\u793C\u8C8C\u63A5\u53D7",
+        "\u8868\u9762\u9547\u5B9A\uFF0C\u5176\u5B9E\u6709\u70B9\u4E0D\u597D\u610F\u601D",
+        "\u4F1A\u5C34\u5C2C\u5230\u60F3\u7ACB\u523B\u8F6C\u79FB\u8BDD\u9898"
+      ),
+      "display"
+    ),
+    question(
+      "Q19",
+      "D",
+      "\u8868\u8FBE\u81EA\u5DF1\u60F3\u6CD5\u65F6\uFF0C\u4F60\u66F4\u50CF\u4F18\u96C5\u4EAE\u76F8\uFF0C\u8FD8\u662F\u4F4E\u8C03\u4F38\u4E2A\u722A\uFF1F",
+      options(
+        "\u6211\u4F1A\u660E\u786E\u8BF4\u51FA\u6765\uFF0C\u5B58\u5728\u611F\u8FD9\u4E8B\u4E0D\u5FC5\u85CF",
+        "\u8BE5\u8BF4\u7684\u65F6\u5019\u4F1A\u8BF4\uFF0C\u4E5F\u4E0D\u6015\u522B\u4EBA\u6CE8\u610F\u5230",
+        "\u4F1A\u8868\u8FBE\uFF0C\u4F46\u901A\u5E38\u6BD4\u8F83\u514B\u5236",
+        "\u9664\u975E\u5FC5\u8981\uFF0C\u4E0D\u7136\u6211\u66F4\u613F\u610F\u8BA9\u522B\u4EBA\u5148\u8BF4"
+      ),
+      "display"
+    ),
+    question(
+      "Q20",
+      "D",
+      "\u5982\u679C\u6709\u4E2A\u80FD\u8BA9\u4F60\u6210\u4E3A\u5168\u573A\u7126\u70B9\u7684\u673A\u4F1A\uFF0C\u4F60\u4F1A\u8DF3\u4E0A\u53BB\uFF0C\u8FD8\u662F\u5148\u770B\u770B\u6709\u6CA1\u6709\u5FC5\u8981\uFF1F",
+      options(
+        "\u5982\u679C\u6211\u80FD\u63A5\u4F4F\uFF0C\u8FD9\u79CD\u673A\u4F1A\u5F53\u7136\u4E0A",
+        "\u770B\u573A\u5408\uFF0C\u5408\u9002\u7684\u8BDD\u6211\u4E0D\u4ECB\u610F\u4EAE\u76F8",
+        "\u9664\u975E\u771F\u7684\u9700\u8981\uFF0C\u4E0D\u7136\u6211\u4E0D\u4F1A\u4E3B\u52A8\u51B2",
+        "\u80FD\u4E0D\u5F53\u7126\u70B9\u5C31\u4E0D\u5F53\uFF0C\u5B89\u9759\u4E00\u70B9\u66F4\u8212\u670D"
+      ),
+      "display"
+    ),
+    question(
+      "Q21",
+      "P",
+      "\u8FDE\u7740\u7D2F\u4E86\u51E0\u5929\u540E\uFF0C\u4F60\u6700\u5BB9\u6613\u8FDB\u5165\u54EA\u79CD\u72B6\u6001\uFF1A\u70B8\u6BDB\u3001\u53D1\u5446\u3001\u8EBA\u5E73\uFF0C\u8FD8\u662F\u786C\u6491\u7740\u5DE1\u903B\uFF1F",
+      options(
+        "\u8D8A\u7D2F\u8D8A\u7EF7\u7740\uFF0C\u5148\u628A\u4E8B\u60C5\u9876\u4F4F",
+        "\u8868\u9762\u8FD8\u80FD\u8FD0\u8F6C\uFF0C\u4F46\u813E\u6C14\u4F1A\u660E\u663E\u53D8\u5DEE",
+        "\u4EBA\u4F1A\u5F00\u59CB\u653E\u7A7A\uFF0C\u6548\u7387\u76F4\u7EBF\u4E0B\u964D",
+        "\u76F4\u63A5\u8FDB\u5165\u7701\u7535\u6A21\u5F0F\uFF0C\u5148\u8EBA\u4E86\u518D\u8BF4"
+      ),
+      "pressure"
+    ),
+    question(
+      "Q22",
+      "P",
+      "\u9762\u5BF9\u50AC\u4FC3\u548C\u538B\u8FEB\u611F\u65F6\uFF0C\u4F60\u66F4\u50CF\u7ACB\u523B\u54C8\u6C14\u81EA\u4FDD\uFF0C\u8FD8\u662F\u54AC\u54AC\u7259\u7EE7\u7EED\u625B\uFF1F",
+      options(
+        "\u5148\u625B\u4F4F\uFF0C\u538B\u529B\u518D\u5927\u4E5F\u4E0D\u80FD\u5012",
+        "\u5634\u4E0A\u4E0D\u8BF4\uFF0C\u5FC3\u91CC\u5DF2\u7ECF\u5F00\u59CB\u70B8\u4E86",
+        "\u4F1A\u60F3\u62C9\u5F00\u8DDD\u79BB\uFF0C\u5148\u4FDD\u62A4\u81EA\u5DF1\u7684\u72B6\u6001",
+        "\u5148\u9003\u79BB\u8FD9\u4E2A\u73AF\u5883\uFF0C\u4E0D\u7136\u6211\u771F\u7684\u4F1A\u5B95\u673A"
+      ),
+      "pressure"
+    ),
+    question(
+      "Q23",
+      "P",
+      "\u6709\u4EBA\u7CBE\u51C6\u8E29\u4E2D\u4F60\u7684\u96F7\u70B9\u65F6\uFF0C\u4F60\u4F1A\u5F53\u573A\u4EAE\u722A\uFF0C\u8FD8\u662F\u5148\u51B7\u8138\u64A4\u79BB\u73B0\u573A\uFF1F",
+      options(
+        "\u4F1A\u76F4\u63A5\u56DE\u51FB\uFF0C\u8FB9\u754C\u4E0D\u80FD\u767D\u8E29",
+        "\u4E0D\u4E00\u5B9A\u7ACB\u523B\u53D1\u4F5C\uFF0C\u4F46\u6001\u5EA6\u4F1A\u5F88\u660E\u663E",
+        "\u5148\u62C9\u5F00\u8DDD\u79BB\uFF0C\u4E4B\u540E\u518D\u51B3\u5B9A\u8981\u4E0D\u8981\u5904\u7406",
+        "\u61D2\u5F97\u5BF9\u7EBF\uFF0C\u6211\u4E00\u822C\u9009\u62E9\u9ED8\u9ED8\u8FDC\u79BB"
+      ),
+      "pressure"
+    ),
+    question(
+      "Q24",
+      "P",
+      "\u7279\u522B\u60F3\u9003\u79BB\u4E16\u754C\u7684\u65F6\u5019\uFF0C\u4F60\u4E00\u822C\u4F1A\u600E\u4E48\u7ED9\u81EA\u5DF1\u56DE\u8840\uFF1A\u8EB2\u56DE\u7A9D\u91CC\u3001\u627E\u4EBA\u8D34\u8D34\u3001\u8F6C\u79FB\u6CE8\u610F\u529B\uFF0C\u8FD8\u662F\u7761\u4E00\u89C9\u91CD\u542F\uFF1F",
+      options(
+        "\u627E\u70B9\u4E8B\u7EE7\u7EED\u505A\uFF0C\u8BA9\u81EA\u5DF1\u522B\u505C\u4E0B\u6765",
+        "\u627E\u4FE1\u4EFB\u7684\u4EBA\u8BF4\u8BF4\u8BDD\uFF0C\u4F1A\u6062\u590D\u5F97\u5FEB\u4E00\u70B9",
+        "\u81EA\u5DF1\u5F85\u7740\u6700\u6709\u6548\uFF0C\u5B89\u9759\u4E00\u4E0B\u5C31\u597D",
+        "\u5148\u65AD\u7535\u4F11\u7720\uFF0C\u9192\u6765\u518D\u91CD\u65B0\u505A\u4EBA"
+      ),
+      "pressure"
+    )
+  ];
+  var RESULTS = [
+    result(
+      "01",
+      "S+A+O+D+",
+      "\u6743\u5A01\u732B",
+      "\u5730\u76D8\u611F\u5F88\u5F3A\u7684\u63A7\u573A\u578B\u5927\u732B",
+      "\u4F60\u8EAB\u4E0A\u6709\u4E00\u79CD\u5929\u7136\u7684\u201C\u522B\u5435\uFF0C\u6211\u6765\u5B9A\u201D\u7684\u6C14\u573A\u3002\u4F60\u505A\u4E8B\u4E0D\u7231\u778E\u4E71\u51B2\uFF0C\u66F4\u559C\u6B22\u628A\u8282\u594F\u63E1\u5728\u81EA\u5DF1\u624B\u91CC\u3002\u5F88\u591A\u4EBA\u4F1A\u89C9\u5F97\u4F60\u53EF\u9760\u3001\u7A33\u3001\u50CF\u9886\u5BFC\uFF0C\u4F46\u719F\u4E86\u4E4B\u540E\u624D\u77E5\u9053\uFF0C\u4F60\u4E5F\u4E0D\u662F\u51F6\uFF0C\u4F60\u53EA\u662F\u5355\u7EAF\u4E0D\u559C\u6B22\u5931\u63A7\u3002",
+      "\u6D4B\u51FA\u6743\u5A01\u732B\u7684\u6211\uFF0C\u8FDE\u7A7A\u6C14\u90FD\u5F97\u5148\u8FC7\u6765\u6C47\u62A5\u5DE5\u4F5C\u3002",
+      "\u5C5E\u4E8E\u4F60\u7684\u732B\u8584\u8377\uFF0C\u662F\u90A3\u79CD\u770B\u522B\u4EBA\u4E00\u987F\u4E71\u5FD9\uFF0C\u6700\u540E\u8FD8\u5F97\u4F60\u51FA\u6765\u6536\u573A\u7684\u5185\u5BB9\u3002",
+      "\u4F60\u5DF2\u89E3\u9501\u6743\u5A01\u732B\uFF0C\u4ECA\u65E5\u5730\u76D8\u5DE1\u903B\u6743\u5F52\u4F60\u6240\u6709\u3002",
+      "authority-cat",
+      "#ffb300",
+      "leader"
+    ),
+    result(
+      "02",
+      "S+A+O+D-",
+      "\u6253\u5DE5\u732B",
+      "\u5634\u4E0A\u60F3\u8F9E\u804C\uFF0C\u884C\u52A8\u4E0A\u6700\u80FD\u625B",
+      "\u4F60\u662F\u90A3\u79CD\u4E00\u8FB9\u558A\u7D2F\uFF0C\u4E00\u8FB9\u628A\u6D3B\u9ED8\u9ED8\u505A\u5B8C\u7684\u4EBA\u3002\u8D23\u4EFB\u611F\u8FD9\u4E1C\u897F\u5BF9\u4F60\u6765\u8BF4\u50CF\u81EA\u5E26\u7684\u732B\u7CAE\u7897\uFF0C\u7529\u4E0D\u6389\u3002\u4F60\u4E0D\u4E00\u5B9A\u7231\u9AD8\u8C03\u51FA\u5934\uFF0C\u4F46\u5173\u952E\u65F6\u523B\u5927\u5BB6\u603B\u4F1A\u9ED8\u8BA4\u201C\u8FD9\u4E8B\u4EA4\u7ED9\u4F60\u5E94\u8BE5\u80FD\u884C\u201D\u3002",
+      "\u6D4B\u51FA\u6765\u662F\u6253\u5DE5\u732B\uFF0C\u5F88\u5408\u7406\uFF0C\u6211\u7684\u547D\u8FD0\u4E00\u773C\u5C31\u88AB\u7CFB\u7EDF\u770B\u7A7F\u3002",
+      "\u5C5E\u4E8E\u4F60\u7684\u732B\u8584\u8377\uFF0C\u662F\u90A3\u79CD\u53C8\u82E6\u53C8\u597D\u7B11\u3001\u7B11\u5B8C\u8FD8\u5F97\u7EE7\u7EED\u4E0A\u73ED\u7684\u5185\u5BB9\u3002",
+      "\u4F60\u5DF2\u89E3\u9501\u6253\u5DE5\u732B\uFF0C\u672C\u5468\u5DE5\u4F4D\u6700\u4F73\u9A7B\u5B88\u9009\u624B\u5C31\u662F\u4F60\u3002",
+      "worker-cat",
+      "#f5a623",
+      "worker"
+    ),
+    result(
+      "03",
+      "S+A+O-D+",
+      "\u571F\u8C6A\u732B",
+      "\u6392\u9762\u3001\u6C14\u573A\u3001\u51FA\u573A\u90FD\u8981\u591F\u4EAE",
+      "\u4F60\u4E0D\u4E00\u5B9A\u771F\u7684\u9AD8\u8C03\uFF0C\u4F46\u4F60\u5F88\u77E5\u9053\u201C\u5B58\u5728\u611F\u201D\u8FD9\u4EF6\u4E8B\u7684\u4EF7\u503C\u3002\u4F60\u6709\u884C\u52A8\u529B\uFF0C\u4E5F\u4E0D\u6015\u88AB\u770B\u89C1\uFF0C\u751A\u81F3\u6709\u70B9\u4EAB\u53D7\u90A3\u79CD\u201C\u6211\u4E00\u51FA\u573A\u5927\u5BB6\u5C31\u77E5\u9053\u4E0D\u4E00\u6837\u201D\u7684\u611F\u89C9\u3002\u4F60\u9002\u5408\u95EA\u4EAE\u767B\u573A\uFF0C\u4E0D\u9002\u5408\u9ED8\u9ED8\u65E0\u95FB\u3002",
+      "\u6D4B\u51FA\u571F\u8C6A\u732B\uFF0C\u8BF4\u660E\u672C\u4EBA\u6C14\u573A\u786E\u5B9E\u6709\u70B9\u85CF\u4E0D\u4F4F\u3002",
+      "\u5C5E\u4E8E\u4F60\u7684\u732B\u8584\u8377\uFF0C\u662F\u90A3\u79CD\u4E00\u770B\u5C31\u5F88\u6709\u6392\u9762\u3001\u5F88\u4F1A\u51FA\u6548\u679C\u7684\u5185\u5BB9\u3002",
+      "\u4F60\u5DF2\u89E3\u9501\u571F\u8C6A\u732B\uFF0C\u4ECA\u65E5\u95EA\u4EAE\u503C\u76F4\u63A5\u62C9\u6EE1\u3002",
+      "flash-cat",
+      "#ff8f3d",
+      "glam"
+    ),
+    result(
+      "04",
+      "S+A+O-D-",
+      "\u5DF4\u62FF\u62FF\u732B",
+      "\u8111\u56DE\u8DEF\u81EA\u7531\u751F\u957F\u7684\u62BD\u8C61\u5FEB\u4E50\u4F53",
+      "\u4F60\u7684\u4EBA\u751F\u4FE1\u6761\u5927\u6982\u662F\u201C\u5148\u6D3B\u51FA\u8282\u76EE\u6548\u679C\u518D\u8BF4\u201D\u3002\u4F60\u53CD\u5E94\u5FEB\u3001\u70B9\u5B50\u591A\u3001\u60C5\u7EEA\u6765\u4E5F\u5FEB\u53BB\u4E5F\u5FEB\uFF0C\u4E0D\u592A\u613F\u610F\u628A\u81EA\u5DF1\u5173\u8FDB\u592A\u6B7B\u7684\u89C4\u5219\u91CC\u3002\u522B\u4EBA\u773C\u91CC\u4F60\u53EF\u80FD\u6709\u70B9\u602A\uFF0C\u4F46\u4E5F\u662F\u90A3\u79CD\u602A\u5F97\u5F88\u6709\u610F\u601D\u7684\u4EBA\u3002",
+      "\u6D4B\u51FA\u5DF4\u62FF\u62FF\u732B\uFF0C\u7CFB\u7EDF\u8BA4\u8BC1\u6211\u662F\u4E00\u53EA\u81EA\u5E26\u62BD\u8C61\u6C14\u8D28\u7684\u732B\u3002",
+      "\u5C5E\u4E8E\u4F60\u7684\u732B\u8584\u8377\uFF0C\u662F\u90A3\u79CD\u8D8A\u770B\u8D8A\u79BB\u8C31\u3001\u8D8A\u79BB\u8C31\u8D8A\u4E0A\u5934\u7684\u5185\u5BB9\u3002",
+      "\u4F60\u5DF2\u89E3\u9501\u5DF4\u62FF\u62FF\u732B\uFF0C\u4ECA\u65E5\u79BB\u8C31\u6D53\u5EA6\u8D85\u6807\u3002",
+      "banana-cat",
+      "#ffd54a",
+      "banana"
+    ),
+    result(
+      "05",
+      "S+A-O+D+",
+      "\u8D85\u7EA7\u65E0\u654C\u5B87\u5B99\u5927\u7F8E\u732B",
+      "\u4E3B\u89D2\u611F\u62C9\u6EE1\u7684\u81EA\u4FE1\u53D1\u5149\u4F53",
+      "\u4F60\u8EAB\u4E0A\u90A3\u79CD\u201C\u6211\u5C31\u662F\u5F88\u597D\u770B\u3001\u5F88\u6709\u9B45\u529B\u3001\u5F88\u503C\u5F97\u88AB\u6CE8\u610F\u201D\u7684\u6C14\u8D28\uFF0C\u5176\u5B9E\u4E0D\u662F\u88C5\u51FA\u6765\u7684\uFF0C\u662F\u4F60\u5929\u751F\u5C31\u5E26\u4E00\u70B9\u4E3B\u89D2\u5149\u3002\u4F60\u4E0D\u4E00\u5B9A\u55A7\u95F9\uFF0C\u4F46\u4F60\u5F88\u77E5\u9053\u81EA\u5DF1\u4EC0\u4E48\u65F6\u5019\u8BE5\u767B\u573A\uFF0C\u4E5F\u5F88\u61C2\u5F97\u8BA9\u522B\u4EBA\u770B\u89C1\u4F60\u7684\u597D\u3002",
+      "\u7CFB\u7EDF\u6CA1\u6709\u9A97\u6211\uFF0C\u6211\u679C\u7136\u662F\u8D85\u7EA7\u65E0\u654C\u5B87\u5B99\u5927\u7F8E\u732B\u3002",
+      "\u5C5E\u4E8E\u4F60\u7684\u732B\u8584\u8377\uFF0C\u662F\u90A3\u79CD\u770B\u5B8C\u4F1A\u5FCD\u4E0D\u4F4F\u89C9\u5F97\u201C\u6211\u4E5F\u592A\u6709\u54C1\u4E86\u5427\u201D\u7684\u5185\u5BB9\u3002",
+      "\u4F60\u5DF2\u89E3\u9501\u8D85\u7EA7\u65E0\u654C\u5B87\u5B99\u5927\u7F8E\u732B\uFF0C\u4ECA\u65E5\u7F8E\u8C8C\u548C\u6C14\u573A\u53CC\u53CC\u4E0A\u7EBF\u3002",
+      "beauty-cat",
+      "#ff87c2",
+      "beauty"
+    ),
+    result(
+      "06",
+      "S+A-O+D-",
+      "\u5B66\u4E60\u732B",
+      "\u8BA4\u771F\u751F\u957F\u3001\u7A33\u5B9A\u8FDB\u6B65\u7684\u81EA\u5F8B\u5C0F\u732B",
+      "\u4F60\u505A\u4E8B\u4E0D\u4E00\u5B9A\u6700\u5FEB\uFF0C\u4F46\u901A\u5E38\u5F88\u7A33\u3002\u4F60\u5BF9\u79E9\u5E8F\u3001\u8BA1\u5212\u548C\u6210\u957F\u611F\u6709\u5929\u7136\u597D\u611F\uFF0C\u4E0D\u592A\u559C\u6B22\u778E\u5FD9\uFF0C\u4E5F\u4E0D\u559C\u6B22\u7A7A\u8F6C\u3002\u4F60\u6700\u8212\u670D\u7684\u72B6\u6001\u662F\uFF1A\u77E5\u9053\u81EA\u5DF1\u4E3A\u4EC0\u4E48\u52AA\u529B\uFF0C\u4E5F\u77E5\u9053\u4E0B\u4E00\u6B65\u8BE5\u5F80\u54EA\u8E29\u3002",
+      "\u6D4B\u51FA\u5B66\u4E60\u732B\uFF0C\u5408\u7406\uFF0C\u6211\u7684\u4EBA\u751F\u4E3B\u7EBF\u679C\u7136\u662F\u9ED8\u9ED8\u5347\u7EA7\u3002",
+      "\u5C5E\u4E8E\u4F60\u7684\u732B\u8584\u8377\uFF0C\u662F\u90A3\u79CD\u770B\u5B8C\u4F1A\u8BA9\u4EBA\u60F3\u987A\u624B\u628A\u81EA\u5DF1\u4E5F\u6574\u7406\u4E00\u4E0B\u7684\u5185\u5BB9\u3002",
+      "\u4F60\u5DF2\u89E3\u9501\u5B66\u4E60\u732B\uFF0C\u7ECF\u9A8C\u503C\u5DF2\u81EA\u52A8\u589E\u52A0\u3002",
+      "study-cat",
+      "#7fcf6d",
+      "study"
+    ),
+    result(
+      "07",
+      "S+A-O-D+",
+      "\u6211\u8BF4\u6211\u662F\u732B",
+      "\u4EBA\u8BBE\u9C9C\u660E\u3001\u6001\u5EA6\u660E\u786E\u7684\u81EA\u5B9A\u4E49\u9009\u624B",
+      "\u4F60\u5F88\u6E05\u695A\u81EA\u5DF1\u60F3\u6210\u4E3A\u4EC0\u4E48\u6837\u7684\u4EBA\uFF0C\u4E5F\u4E0D\u592A\u613F\u610F\u88AB\u968F\u4FBF\u5B9A\u4E49\u3002\u4F60\u6709\u4E00\u70B9\u8868\u6F14\u611F\uFF0C\u4E5F\u6709\u4E00\u70B9\u575A\u6301\u81EA\u6211\u7684\u6267\u62D7\uFF0C\u522B\u4EBA\u53EF\u80FD\u4F1A\u89C9\u5F97\u4F60\u201C\u620F\u5F88\u591A\u201D\uFF0C\u4F46\u5176\u5B9E\u4F60\u53EA\u662F\u5F88\u61C2\u5F97\u7528\u81EA\u5DF1\u7684\u65B9\u5F0F\u51FA\u573A\u3002",
+      "\u6D4B\u51FA\u6211\u8BF4\u6211\u662F\u732B\uFF0C\u4E0D\u63A5\u53D7\u53CD\u9A73\uFF0C\u6211\u8BF4\u662F\u5C31\u662F\u3002",
+      "\u5C5E\u4E8E\u4F60\u7684\u732B\u8584\u8377\uFF0C\u662F\u90A3\u79CD\u4EBA\u683C\u5F88\u5F3A\u3001\u6001\u5EA6\u5F88\u8DB3\u3001\u8D8A\u770B\u8D8A\u4E0A\u5934\u7684\u5185\u5BB9\u3002",
+      "\u4F60\u5DF2\u89E3\u9501\u6211\u8BF4\u6211\u662F\u732B\uFF0C\u8EAB\u4EFD\u8BA4\u8BC1\u7531\u4F60\u4EB2\u81EA\u7B7E\u53D1\u3002",
+      "custom-cat",
+      "#8b6cff",
+      "identity"
+    ),
+    result(
+      "08",
+      "S+A-O-D-",
+      "\u53EF\u7231\u55B5",
+      "\u4EB2\u548C\u529B\u5F88\u5F3A\u7684\u6E29\u67D4\u6CBB\u6108\u7CFB",
+      "\u4F60\u662F\u90A3\u79CD\u8BA9\u4EBA\u76F8\u5904\u8D77\u6765\u5F88\u8212\u670D\u7684\u4EBA\u3002\u4F60\u4E0D\u6025\u7740\u63A7\u573A\uFF0C\u4E5F\u4E0D\u62A2\u955C\uFF0C\u4F46\u4F60\u8EAB\u4E0A\u6709\u4E00\u79CD\u5929\u7136\u7684\u67D4\u8F6F\u611F\uFF0C\u8BA9\u522B\u4EBA\u613F\u610F\u9760\u8FD1\u4F60\u3002\u4F60\u4E0D\u662F\u6CA1\u6709\u4E3B\u89C1\uFF0C\u53EA\u662F\u4F60\u66F4\u64C5\u957F\u7528\u8212\u670D\u7684\u65B9\u5F0F\u8BA9\u5173\u7CFB\u81EA\u7136\u53D1\u751F\u3002",
+      "\u6D4B\u51FA\u53EF\u7231\u55B5\uFF0C\u770B\u6765\u6211\u786E\u5B9E\u662F\u4E00\u53EA\u6BD4\u8F83\u9002\u5408\u88AB\u559C\u6B22\u7684\u5C0F\u732B\u3002",
+      "\u5C5E\u4E8E\u4F60\u7684\u732B\u8584\u8377\uFF0C\u662F\u90A3\u79CD\u8F6F\u4E4E\u4E4E\u3001\u770B\u5B8C\u5FC3\u60C5\u4F1A\u53D8\u597D\u7684\u5185\u5BB9\u3002",
+      "\u4F60\u5DF2\u89E3\u9501\u53EF\u7231\u55B5\uFF0C\u4ECA\u65E5\u4EB2\u548C\u529B\u8F7B\u677E\u62FF\u4E0B\u3002",
+      "cute-cat",
+      "#ffb7c5",
+      "soft"
+    ),
+    result(
+      "09",
+      "S-A+O+D+",
+      "\u90AA\u6076\u94F6\u6E10\u5C42",
+      "\u5B89\u9759\u89C2\u5BDF\u4F46\u5F88\u4F1A\u62FF\u634F\u5C40\u52BF\u7684\u8179\u9ED1\u6D3E",
+      "\u4F60\u4E0D\u662F\u7231\u70ED\u95F9\u7684\u4EBA\uFF0C\u4F46\u4F60\u5F88\u4F1A\u770B\u5C40\uFF0C\u4E5F\u5F88\u4F1A\u5224\u65AD\u3002\u4F60\u6709\u884C\u52A8\u529B\uFF0C\u4E5F\u6709\u8FB9\u754C\u611F\uFF0C\u5F88\u591A\u65F6\u5019\u4F60\u53EA\u662F\u61D2\u5F97\u8868\u73B0\uFF0C\u4E0D\u4EE3\u8868\u4F60\u4E0D\u6E05\u9192\u3002\u4F60\u50CF\u90A3\u79CD\u770B\u8D77\u6765\u6CA1\u5728\u8BF4\u8BDD\uFF0C\u5176\u5B9E\u5FC3\u91CC\u5DF2\u7ECF\u628A\u5168\u573A\u770B\u660E\u767D\u7684\u732B\u3002",
+      "\u6D4B\u51FA\u90AA\u6076\u94F6\u6E10\u5C42\uFF0C\u8BF4\u660E\u6211\u53EA\u662F\u8868\u9762\u5B89\u9759\uFF0C\u5185\u91CC\u5F88\u4F1A\u7B97\u3002",
+      "\u5C5E\u4E8E\u4F60\u7684\u732B\u8584\u8377\uFF0C\u662F\u90A3\u79CD\u8D8A\u770B\u8D8A\u89C9\u5F97\u201C\u6211\u65E9\u5C31\u731C\u5230\u4E86\u201D\u7684\u5185\u5BB9\u3002",
+      "\u4F60\u5DF2\u89E3\u9501\u90AA\u6076\u94F6\u6E10\u5C42\uFF0C\u4ECA\u65E5\u8179\u9ED1\u503C\u6084\u6084\u4E0A\u6DA8\u3002",
+      "silver-cat",
+      "#b0b7c3",
+      "silver"
+    ),
+    result(
+      "10",
+      "S-A+O+D-",
+      "\u54C8\u6C14\u732B",
+      "\u8FB9\u754C\u611F\u8D85\u5F3A\u7684\u5E94\u6FC0\u81EA\u4FDD\u578B",
+      "\u4F60\u4E0D\u662F\u96BE\u76F8\u5904\uFF0C\u4F60\u53EA\u662F\u7279\u522B\u9700\u8981\u5B89\u5168\u611F\u3002\u4F60\u5BF9\u5916\u754C\u7684\u6253\u6270\u3001\u538B\u8FEB\u3001\u8D8A\u754C\u7279\u522B\u654F\u9510\uFF0C\u6240\u4EE5\u4F1A\u4E0B\u610F\u8BC6\u5148\u7AD6\u8D77\u523A\u3002\u4F60\u5904\u7406\u4E8B\u60C5\u5E76\u4E0D\u7CCA\u6D82\uFF0C\u751A\u81F3\u5F88\u5229\u843D\uFF0C\u53EA\u662F\u4F60\u66F4\u4E60\u60EF\u5148\u4FDD\u62A4\u81EA\u5DF1\uFF0C\u518D\u51B3\u5B9A\u8981\u4E0D\u8981\u9760\u8FD1\u522B\u4EBA\u3002",
+      "\u6D4B\u51FA\u54C8\u6C14\u732B\uFF0C\u522B\u95EE\uFF0C\u95EE\u5C31\u662F\u6211\u5148\u81EA\u4FDD\u518D\u8BF4\u3002",
+      "\u5C5E\u4E8E\u4F60\u7684\u732B\u8584\u8377\uFF0C\u662F\u90A3\u79CD\u628A\u201C\u522B\u6765\u70E6\u6211\u201D\u8868\u8FBE\u5F97\u975E\u5E38\u51C6\u786E\u7684\u5185\u5BB9\u3002",
+      "\u4F60\u5DF2\u89E3\u9501\u54C8\u6C14\u732B\uFF0C\u5B89\u5168\u8DDD\u79BB\u5DF2\u81EA\u52A8\u62C9\u5F00\u3002",
+      "hiss-cat",
+      "#7d8a91",
+      "guard"
+    ),
+    result(
+      "11",
+      "S-A+O-D+",
+      "\u5632\u8BBD\u732B",
+      "\u5634\u5F88\u5FEB\u3001\u6897\u5F88\u591A\u3001\u53CD\u5E94\u4E00\u6D41\u7684\u9634\u9633\u5927\u5E08",
+      "\u4F60\u5929\u751F\u5E26\u4E00\u70B9\u201C\u6211\u5148\u5410\u69FD\u4E24\u53E5\u201D\u7684\u672C\u80FD\u3002\u4F60\u4E0D\u4E00\u5B9A\u6076\u610F\uFF0C\u4F46\u4F60\u592A\u64C5\u957F\u770B\u7A7F\u4E00\u4E9B\u79BB\u8C31\u65F6\u523B\uFF0C\u6240\u4EE5\u5F88\u5BB9\u6613\u7528\u8868\u60C5\u3001\u8BED\u6C14\u548C\u51B7\u5E7D\u9ED8\u7CBE\u51C6\u547D\u4E2D\u73B0\u573A\u3002\u4F60\u6709\u821E\u53F0\u611F\uFF0C\u4E5F\u6709\u70B9\u9632\u5FA1\u6027\uFF0C\u6897\u662F\u4F60\u7684\u6B66\u5668\u3002",
+      "\u6D4B\u51FA\u5632\u8BBD\u732B\uFF0C\u5408\u7406\uFF0C\u6211\u7684\u8868\u60C5\u5305\u6BD4\u8BED\u8A00\u7CFB\u7EDF\u66F4\u8BDA\u5B9E\u3002",
+      "\u5C5E\u4E8E\u4F60\u7684\u732B\u8584\u8377\uFF0C\u662F\u90A3\u79CD\u4E00\u9488\u89C1\u8840\u3001\u770B\u5B8C\u60F3\u7ACB\u523B\u53D1\u7FA4\u91CC\u7684\u5185\u5BB9\u3002",
+      "\u4F60\u5DF2\u89E3\u9501\u5632\u8BBD\u732B\uFF0C\u4ECA\u65E5\u9634\u9633\u80FD\u91CF\u7A33\u5B9A\u8F93\u51FA\u3002",
+      "sarcasm-cat",
+      "#9d6cff",
+      "snark"
+    ),
+    result(
+      "12",
+      "S-A+O-D-",
+      "\u547D\u82E6\u732B",
+      "\u5012\u9709\u611F\u4E0E\u751F\u547D\u529B\u5E76\u5B58\u7684\u82E6\u4E2D\u4F5C\u4E50\u6D3E",
+      "\u4F60\u4E0D\u662F\u4E0D\u52AA\u529B\uFF0C\u4F60\u53EA\u662F\u7ECF\u5E38\u5728\u52AA\u529B\u7684\u65F6\u5019\u987A\u4FBF\u88AB\u751F\u6D3B\u7ECA\u4E00\u4E0B\u3002\u4F60\u884C\u52A8\u4E0A\u4E0D\u7B97\u6162\uFF0C\u4F46\u4E5F\u4E0D\u592A\u4F1A\u62A2\u4F4D\u7F6E\uFF0C\u5F88\u591A\u65F6\u5019\u50CF\u662F\u9ED8\u9ED8\u625B\u7740\u4E00\u4E9B\u522B\u4EBA\u770B\u4E0D\u89C1\u7684\u5C0F\u75B2\u60EB\u3002\u597D\u7B11\u7684\u662F\uFF0C\u4F60\u8D8A\u547D\u82E6\uFF0C\u8D8A\u5BB9\u6613\u8BA9\u4EBA\u89C9\u5F97\u771F\u5B9E\u53C8\u53EF\u7231\u3002",
+      "\u6D4B\u51FA\u547D\u82E6\u732B\uFF0C\u7CFB\u7EDF\u6BD4\u6211\u670B\u53CB\u8FD8\u61C2\u6211\u6700\u8FD1\u7684\u72B6\u6001\u3002",
+      "\u5C5E\u4E8E\u4F60\u7684\u732B\u8584\u8377\uFF0C\u662F\u90A3\u79CD\u201C\u600E\u4E48\u4F1A\u8FD9\u4E48\u60E8\u4F46\u53C8\u8FD9\u4E48\u597D\u7B11\u201D\u7684\u5185\u5BB9\u3002",
+      "\u4F60\u5DF2\u89E3\u9501\u547D\u82E6\u732B\uFF0C\u4ECA\u65E5\u547D\u8FD0\u53C8\u7ED9\u4F60\u52A0\u4E86\u70B9\u620F\u3002",
+      "hard-life-cat",
+      "#8d6e63",
+      "hardlife"
+    ),
+    result(
+      "13",
+      "S-A-O+D+",
+      "\u897F\u683C\u739B\u732B",
+      "\u72EC\u5904\u9AD8\u7EA7\u3001\u8282\u594F\u81EA\u6210\u4E00\u6D3E\u7684\u51B7\u9759\u6D3E",
+      "\u4F60\u5F88\u5C11\u4E3A\u4E86\u878D\u5165\u8C01\u800C\u6539\u53D8\u81EA\u5DF1\u7684\u8282\u594F\u3002\u4F60\u4E60\u60EF\u5148\u770B\u6E05\uFF0C\u518D\u51B3\u5B9A\u8981\u4E0D\u8981\u52A8\uFF0C\u4E5F\u6709\u5F88\u5F3A\u7684\u8FB9\u754C\u611F\u548C\u5185\u5728\u79E9\u5E8F\u3002\u522B\u4EBA\u53EF\u80FD\u4F1A\u89C9\u5F97\u4F60\u9AD8\u51B7\uFF0C\u4F46\u5176\u5B9E\u4F60\u53EA\u662F\u66F4\u76F8\u4FE1\u81EA\u5DF1\u7684\u5224\u65AD\uFF0C\u4E0D\u559C\u6B22\u6CA1\u5FC5\u8981\u7684\u70ED\u95F9\u3002",
+      "\u6D4B\u51FA\u897F\u683C\u739B\u732B\uFF0C\u8BF4\u660E\u6211\u679C\u7136\u9002\u5408\u4E00\u4E2A\u4EBA\u4F18\u96C5\u8DEF\u8FC7\u5168\u573A\u3002",
+      "\u5C5E\u4E8E\u4F60\u7684\u732B\u8584\u8377\uFF0C\u662F\u90A3\u79CD\u51B7\u9759\u3001\u514B\u5236\u3001\u4F46\u540E\u52B2\u5F88\u5F3A\u7684\u5185\u5BB9\u3002",
+      "\u4F60\u5DF2\u89E3\u9501\u897F\u683C\u739B\u732B\uFF0C\u72EC\u5904\u503C\u4E0E\u6C14\u573A\u503C\u540C\u65F6\u4E0A\u5347\u3002",
+      "sigma-cat",
+      "#5c6f91",
+      "sigma"
+    ),
+    result(
+      "14",
+      "S-A-O+D-",
+      "\u5FF5\u5FF5\u53E8\u53E8\u6C14\u732B\u732B",
+      "\u5185\u5FC3\u5F39\u5E55\u5F88\u591A\u7684\u7EC6\u8282\u611F\u53D7\u578B",
+      "\u4F60\u5BF9\u5F88\u591A\u4E8B\u60C5\u90FD\u6709\u611F\u89C9\uFF0C\u4E5F\u5F88\u5BB9\u6613\u5728\u8111\u5B50\u91CC\u5F00\u5C0F\u5267\u573A\u3002\u4F60\u4E0D\u4E00\u5B9A\u4F1A\u5927\u5F20\u65D7\u9F13\u5730\u8868\u73B0\uFF0C\u4F46\u4F60\u4F1A\u8BB0\u5F97\u7EC6\u8282\u3001\u53CD\u590D\u590D\u76D8\u3001\u8FB9\u60F3\u8FB9\u5410\u69FD\u3002\u4F60\u6709\u81EA\u5DF1\u7684\u89C4\u5219\uFF0C\u4E5F\u6709\u81EA\u5DF1\u7684\u5C0F\u813E\u6C14\uFF0C\u53EA\u662F\u66F4\u591A\u65F6\u5019\u90FD\u53D8\u6210\u4E86\u5185\u5FC3\u72EC\u767D\u3002",
+      "\u6D4B\u51FA\u5FF5\u5FF5\u53E8\u53E8\u6C14\u732B\u732B\uFF0C\u6211\u7684\u5185\u5FC3\u65C1\u767D\u7EC8\u4E8E\u88AB\u6293\u5305\u4E86\u3002",
+      "\u5C5E\u4E8E\u4F60\u7684\u732B\u8584\u8377\uFF0C\u662F\u90A3\u79CD\u8D8A\u770B\u8D8A\u60F3\u63A5\u4E00\u53E5\u201C\u6211\u65E9\u5C31\u8BF4\u4E86\u5427\u201D\u7684\u5185\u5BB9\u3002",
+      "\u4F60\u5DF2\u89E3\u9501\u5FF5\u5FF5\u53E8\u53E8\u6C14\u732B\u732B\uFF0C\u4ECA\u65E5\u8111\u5185\u5F39\u5E55\u5DF2\u6EE1\u5C4F\u3002",
+      "murmur-cat",
+      "#6b8f5a",
+      "murmur"
+    ),
+    result(
+      "15",
+      "S-A-O-D+",
+      "huh \u732B",
+      "\u61F5\u5708\u3001\u89C2\u5BDF\u3001\u53CD\u5E94\u6162\u534A\u62CD\u4F46\u5F88\u771F\u5B9E",
+      "\u4F60\u9762\u5BF9\u4E16\u754C\u65F6\u5E38\u5E38\u5148\u662F\u4E00\u4E2A\u95EE\u53F7\u3002\u4E0D\u662F\u4F60\u4E0D\u806A\u660E\uFF0C\u800C\u662F\u4F60\u4E60\u60EF\u5148\u786E\u8BA4\u73B0\u5728\u5230\u5E95\u53D1\u751F\u4E86\u4EC0\u4E48\uFF0C\u518D\u51B3\u5B9A\u8981\u4E0D\u8981\u52A0\u5165\u3002\u4F60\u5E26\u4E00\u70B9\u5929\u7136\u7684\u8FDF\u7591\u611F\uFF0C\u4E5F\u5E26\u4E00\u70B9\u53EF\u7231\u7684\u65E0\u8F9C\u611F\uFF0C\u6240\u4EE5\u5E38\u5E38\u663E\u5F97\u771F\u5B9E\u53C8\u597D\u7B11\u3002",
+      "\u6D4B\u51FA huh \u732B\uFF0C\u5F88\u5BF9\uFF0C\u6211\u7684\u4EBA\u751F\u5E38\u6001\u5C31\u662F\u5148\u7591\u60D1\u4E09\u79D2\u3002",
+      "\u5C5E\u4E8E\u4F60\u7684\u732B\u8584\u8377\uFF0C\u662F\u90A3\u79CD\u8BA9\u4EBA\u8FB9\u770B\u8FB9\u53D1\u51FA\u201C\u554A\uFF1F\u201D\u7684\u5185\u5BB9\u3002",
+      "\u4F60\u5DF2\u89E3\u9501 huh \u732B\uFF0C\u4ECA\u65E5\u95EE\u53F7\u6D53\u5EA6\u6301\u7EED\u504F\u9AD8\u3002",
+      "huh-cat",
+      "#77b7d9",
+      "huh"
+    ),
+    result(
+      "16",
+      "S-A-O-D-",
+      "\u843D\u6C64\u55B5",
+      "\u654F\u611F\u8106\u5F31\u4F46\u5F88\u80FD\u8BA9\u4EBA\u5FC3\u8F6F\u7684\u8F6F\u4E4E\u4E4E\u9009\u624B",
+      "\u4F60\u5BF9\u60C5\u7EEA\u548C\u73AF\u5883\u90FD\u5F88\u654F\u611F\uFF0C\u6240\u4EE5\u6709\u65F6\u5019\u4F1A\u663E\u5F97\u6709\u70B9\u72FC\u72C8\u3001\u6709\u70B9\u59D4\u5C48\u3001\u6709\u70B9\u60F3\u8EB2\u5F00\u3002\u4F46\u4F60\u5E76\u4E0D\u8106\u5F31\u5230\u7AD9\u4E0D\u8D77\u6765\uFF0C\u4F60\u53EA\u662F\u592A\u5BB9\u6613\u611F\u53D7\u5230\u751F\u6D3B\u7684\u91CD\u91CF\u3002\u4E5F\u6B63\u56E0\u4E3A\u8FD9\u6837\uFF0C\u4F60\u7684\u771F\u8BDA\u548C\u67D4\u8F6F\u4F1A\u8BA9\u4EBA\u5F88\u60F3\u9760\u8FD1\u3002",
+      "\u6D4B\u51FA\u843D\u6C64\u55B5\uFF0C\u6211\u627F\u8BA4\u6211\u6709\u65F6\u5019\u786E\u5B9E\u50CF\u88AB\u751F\u6D3B\u6DCB\u4E86\u4E00\u8EAB\u3002",
+      "\u5C5E\u4E8E\u4F60\u7684\u732B\u8584\u8377\uFF0C\u662F\u90A3\u79CD\u6709\u70B9\u59D4\u5C48\u3001\u6709\u70B9\u6CBB\u6108\u3001\u770B\u5B8C\u4F1A\u8F7B\u8F7B\u53F9\u53E3\u6C14\u7684\u5185\u5BB9\u3002",
+      "\u4F60\u5DF2\u89E3\u9501\u843D\u6C64\u55B5\uFF0C\u4ECA\u65E5\u59D4\u5C48\u503C\u548C\u53EF\u601C\u503C\u540C\u65F6\u751F\u6548\u3002",
+      "wet-cat",
+      "#8ec5c1",
+      "rain"
+    )
+  ];
+  var AUXILIARY_COPY = {
+    "E+P+": "\u4F60\u4E0D\u662F\u6CA1\u813E\u6C14\uFF0C\u4F60\u53EA\u662F\u5E73\u65F6\u61D2\u5F97\u968F\u4FBF\u4EAE\u722A\u3002",
+    "E+P-": "\u4F60\u7684\u60C5\u7EEA\u90FD\u5199\u5728\u8138\u4E0A\uFF0C\u7D2F\u4E86\u4E5F\u53EA\u60F3\u5148\u8EB2\u8D77\u6765\u7F13\u7F13\u3002",
+    "E-P+": "\u4F60\u770B\u8D77\u6765\u5F88\u7A33\uFF0C\u5176\u5B9E\u5F88\u591A\u4E1C\u897F\u90FD\u88AB\u4F60\u9ED8\u9ED8\u625B\u4F4F\u4E86\u3002",
+    "E-P-": "\u4F60\u4E60\u60EF\u628A\u60C5\u7EEA\u6536\u597D\uFF0C\u7B49\u56DE\u5230\u81EA\u5DF1\u7684\u7A9D\u91CC\u518D\u6162\u6162\u5904\u7406\u3002"
+  };
+
+  // js/core/engine.js
+  var DIMENSIONS = ["S", "E", "A", "O", "D", "P"];
+  function createEmptyScores() {
+    return Object.fromEntries(DIMENSIONS.map((key) => [key, 0]));
+  }
+  function applyAnswer(scores, question2) {
+    const next = { ...scores };
+    next[question2.dimension] += question2.scoreMap[question2.optionKey];
+    return next;
+  }
+  function axisSuffix(value) {
+    return value >= 0 ? "+" : "-";
+  }
+  function resolveTypeCode(scores) {
+    return [
+      `S${axisSuffix(scores.S)}`,
+      `A${axisSuffix(scores.A)}`,
+      `O${axisSuffix(scores.O)}`,
+      `D${axisSuffix(scores.D)}`
+    ].join("");
+  }
+  function resolveAuxiliaryCode(scores) {
+    return `E${axisSuffix(scores.E)}P${axisSuffix(scores.P)}`;
+  }
+  function resolveResultByType(results, typeCode) {
+    return results.find((item) => item.typeCode === typeCode) ?? null;
+  }
+
+  // js/ui/background.js
+  function startBackground(canvas) {
+    const ctx = canvas.getContext("2d");
+    if (!ctx) {
+      return () => {
+      };
+    }
+    const particles = Array.from({ length: 14 }, (_, index) => ({
+      x: 36 + index % 4 * 88,
+      y: index * 56,
+      size: 10 + index % 3 * 6,
+      speed: 0.18 + index % 4 * 0.05
+    }));
+    let rafId = 0;
+    function resize() {
+      const ratio = Math.max(1, window.devicePixelRatio || 1);
+      canvas.width = Math.floor(window.innerWidth * ratio);
+      canvas.height = Math.floor(window.innerHeight * ratio);
+      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    }
+    function drawPaw(x, y, size, alpha) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.fillStyle = `rgba(255, 207, 69, ${alpha})`;
+      ctx.beginPath();
+      ctx.arc(0, size * 0.45, size * 0.45, 0, Math.PI * 2);
+      ctx.fill();
+      const toeRadius = size * 0.18;
+      const toeOffset = size * 0.32;
+      [
+        [-toeOffset, -toeOffset],
+        [0, -size * 0.5],
+        [toeOffset, -toeOffset]
+      ].forEach(([dx, dy]) => {
+        ctx.beginPath();
+        ctx.arc(dx, dy, toeRadius, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      ctx.restore();
+    }
+    function frame() {
+      ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+      particles.forEach((particle, index) => {
+        drawPaw(
+          particle.x,
+          particle.y,
+          particle.size,
+          0.12 + index % 3 * 0.04
+        );
+        particle.y += particle.speed;
+        particle.x += Math.sin((particle.y + index * 18) / 55) * 0.12;
+        if (particle.y > window.innerHeight + 40) {
+          particle.y = -20;
+        }
+      });
+      rafId = window.requestAnimationFrame(frame);
+    }
+    resize();
+    window.addEventListener("resize", resize);
+    rafId = window.requestAnimationFrame(frame);
+    return () => {
+      window.cancelAnimationFrame(rafId);
+      window.removeEventListener("resize", resize);
+    };
+  }
+
+  // js/core/state.js
+  var STORAGE_KEY = "maobti.session";
+  var LAST_RESULT_KEY = "maobti.lastResult";
+  function createInitialState() {
+    return {
+      currentQuestionIndex: 0,
+      answers: {},
+      scores: createEmptyScores()
+    };
+  }
+  function getQuestionById(questions, questionId) {
+    return questions.find((item) => item.id === questionId);
+  }
+  function answerQuestion(state, questions, questionId, optionKey) {
+    const question2 = getQuestionById(questions, questionId);
+    const nextScores = applyAnswer(state.scores, {
+      dimension: question2.dimension,
+      optionKey,
+      scoreMap: question2.scoreMap
+    });
+    return {
+      currentQuestionIndex: state.currentQuestionIndex + 1,
+      answers: { ...state.answers, [questionId]: optionKey },
+      scores: nextScores
+    };
+  }
+  function goBackOneQuestion(state, questions) {
+    const previousIndex = Math.max(0, state.currentQuestionIndex - 1);
+    const previousQuestion = questions[previousIndex];
+    if (!previousQuestion) {
+      return { ...state, currentQuestionIndex: previousIndex };
+    }
+    const previousOptionKey = state.answers[previousQuestion.id];
+    if (!previousOptionKey) {
+      return { ...state, currentQuestionIndex: previousIndex };
+    }
+    const revertedScores = {
+      ...state.scores,
+      [previousQuestion.dimension]: state.scores[previousQuestion.dimension] - previousQuestion.scoreMap[previousOptionKey]
+    };
+    const nextAnswers = { ...state.answers };
+    delete nextAnswers[previousQuestion.id];
+    return {
+      currentQuestionIndex: previousIndex,
+      answers: nextAnswers,
+      scores: revertedScores
+    };
+  }
+  function saveSession(storage, state) {
+    storage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }
+  function loadSession(storage) {
+    try {
+      const raw = storage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : createInitialState();
+    } catch {
+      return createInitialState();
+    }
+  }
+  function clearSession(storage) {
+    storage.removeItem(STORAGE_KEY);
+  }
+  function saveLastResult(storage, resultPayload) {
+    try {
+      storage.setItem(LAST_RESULT_KEY, JSON.stringify(resultPayload));
+    } catch {
+    }
+  }
+  function loadLastResult(storage) {
+    try {
+      const raw = storage.getItem(LAST_RESULT_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  }
+
+  // js/ui/templates.js
+  function renderHomeView({ completedCount }) {
+    return `
+    <section class="panel home-card">
+      <img class="brand-icon" src="./icon.png" alt="\u732BBTI" />
+      <p class="eyebrow">\u79BB\u7EBF\u732B\u683C\u6D4B\u8BD5</p>
+      <h1>\u6D4B\u4E00\u6D4B\u4F60\u662F\u54EA\u79CD\u732B\u732B\u4EBA\u683C</h1>
+      <p class="subtitle">24\u9898\u8F7B\u6D4B\u8BD5\uFF0C\u7ED3\u679C\u4EC5\u4F9B\u5A31\u4E50\uFF0C\u4F46\u5F88\u9002\u5408\u622A\u56FE\u53D1\u670B\u53CB\u3002</p>
+      <p class="meta">\u5F53\u524D\u5DF2\u6574\u7406 ${completedCount} \u79CD\u732B\u683C\u7ED3\u679C\u5361\u3002</p>
+      <button type="button" data-action="start-quiz">\u5F00\u59CB\u6D4B\u8BD5</button>
+      <p class="footnote">\u7ED3\u679C\u4EC5\u4F9B\u5A31\u4E50\uFF0C\u8BF7\u6309\u5FC3\u60C5\u5438\u732B\u3002</p>
+    </section>
+  `;
+  }
+  function renderQuizView({ index, total, question: question2 }) {
+    const optionsMarkup = question2.options.map(
+      (option) => `
+        <button type="button" class="option-button" data-option-key="${option.key}">
+          <span class="option-key">${option.key}</span>
+          <span class="option-copy">${option.text}</span>
+        </button>
+      `
+    ).join("");
+    return `
+    <section class="panel quiz-card">
+      <div class="progress-meta">
+        <span>${index + 1} / ${total}</span>
+        <button type="button" class="link-button" data-action="go-back">\u4E0A\u4E00\u9898</button>
+      </div>
+      <div class="progress-bar"><i style="width:${(index + 1) / total * 100}%"></i></div>
+      <h2>${question2.prompt}</h2>
+      <div class="option-list">${optionsMarkup}</div>
+    </section>
+  `;
+  }
+  function renderResultView({ result: result2, auxiliaryText }) {
+    return `
+    <section class="panel result-card">
+      <p class="eyebrow">\u4F60\u7684\u732BBTI\u7ED3\u679C\u662F</p>
+      <h1>${result2.name}</h1>
+      <p class="tagline">${result2.tagline}</p>
+      <div class="result-hero">
+        <div class="result-chip">${result2.name}</div>
+        <p class="share-line">${result2.shareText}</p>
+      </div>
+      <p class="description">${result2.description}</p>
+      <p class="auxiliary">${auxiliaryText}</p>
+      <div class="result-actions">
+        <button type="button" data-action="open-share">\u751F\u6210\u5206\u4EAB\u56FE</button>
+        <button type="button" class="ghost-button" data-action="restart-quiz">\u91CD\u65B0\u6D4B\u8BD5</button>
+      </div>
+    </section>
+  `;
+  }
+  function renderShareOverlay({ resultName }) {
+    return `
+    <div class="overlay-backdrop" data-action="close-share">
+      <section class="panel share-overlay" aria-label="\u5206\u4EAB\u56FE\u9884\u89C8">
+        <p class="eyebrow">\u5206\u4EAB\u56FE\u5DF2\u751F\u6210</p>
+        <h2>${resultName}</h2>
+        <p class="subtitle">\u957F\u6309\u6216\u70B9\u51FB\u4FDD\u5B58\uFF0C\u628A\u4F60\u7684\u732B\u683C\u53D1\u7ED9\u670B\u53CB\u770B\u770B\u3002</p>
+        <div class="share-preview">
+          <img id="share-preview-image" alt="${resultName} \u5206\u4EAB\u56FE\u9884\u89C8" />
+        </div>
+        <div class="result-actions">
+          <button type="button" data-action="download-share">\u4FDD\u5B58\u56FE\u7247</button>
+          <button type="button" class="ghost-button" data-action="close-share">\u5173\u95ED</button>
+        </div>
+      </section>
+    </div>
+  `;
+  }
+  function renderErrorView(message) {
+    return `
+    <section class="panel error-card">
+      <p class="eyebrow">\u732B\u722A\u6253\u6ED1\u4E86</p>
+      <h1>${message}</h1>
+      <button type="button" data-action="reload-app">\u91CD\u65B0\u6253\u5F00</button>
+    </section>
+  `;
+  }
+
+  // js/ui/shareCard.js
+  function wrapText(text, maxCharsPerLine = 14) {
+    const result2 = [];
+    let start = 0;
+    while (start < text.length) {
+      result2.push(text.slice(start, start + maxCharsPerLine));
+      start += maxCharsPerLine;
+    }
+    return result2;
+  }
+  function buildShareCardModel({ result: result2, auxiliaryText }) {
+    return {
+      title: result2.name,
+      subtitle: result2.tagline,
+      lines: [
+        "\u4F60\u7684\u732BBTI\u7ED3\u679C\u662F\uFF1A",
+        result2.name,
+        ...wrapText(result2.shareText, 13),
+        ...wrapText(auxiliaryText, 13)
+      ],
+      theme: {
+        accent: result2.accentColor,
+        ink: "#3e2b1f",
+        panel: "#fffaf0",
+        soft: "#fff1cc"
+      }
+    };
+  }
+  function roundRectPath(ctx, x, y, width, height, radius) {
+    const r = Math.min(radius, width / 2, height / 2);
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + width, y, x + width, y + height, r);
+    ctx.arcTo(x + width, y + height, x, y + height, r);
+    ctx.arcTo(x, y + height, x, y, r);
+    ctx.arcTo(x, y, x + width, y, r);
+    ctx.closePath();
+  }
+  function fillRoundRect(ctx, x, y, width, height, radius) {
+    roundRectPath(ctx, x, y, width, height, radius);
+    ctx.fill();
+  }
+  function drawShareCard(ctx, model, iconImage) {
+    const { width, height } = ctx.canvas;
+    ctx.clearRect(0, 0, width, height);
+    const gradient = ctx.createLinearGradient(0, 0, width, height);
+    gradient.addColorStop(0, "#fff7e8");
+    gradient.addColorStop(1, "#ffe7dd");
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, width, height);
+    ctx.fillStyle = model.theme.soft;
+    fillRoundRect(ctx, 54, 54, width - 108, height - 108, 52);
+    ctx.fillStyle = model.theme.panel;
+    fillRoundRect(ctx, 84, 200, width - 168, height - 360, 56);
+    ctx.fillStyle = model.theme.accent;
+    fillRoundRect(ctx, 120, 240, 260, 84, 28);
+    ctx.fillStyle = model.theme.ink;
+    ctx.font = "bold 42px sans-serif";
+    ctx.fillText("\u732BBTI", 170, 295);
+    if (iconImage) {
+      ctx.drawImage(iconImage, width - 380, 210, 220, 220);
+    }
+    ctx.fillStyle = model.theme.ink;
+    ctx.font = "bold 88px sans-serif";
+    ctx.fillText(model.title, 120, 480);
+    ctx.font = "38px sans-serif";
+    ctx.fillStyle = "#8a5d2f";
+    ctx.fillText(model.subtitle, 120, 550);
+    ctx.fillStyle = model.theme.ink;
+    ctx.font = "42px sans-serif";
+    model.lines.forEach((line, index) => {
+      ctx.fillText(line, 120, 690 + index * 78);
+    });
+    ctx.fillStyle = "rgba(62, 43, 31, 0.12)";
+    ctx.font = "32px sans-serif";
+    ctx.fillText("\u7ED3\u679C\u4EC5\u4F9B\u5A31\u4E50\uFF0C\u6B22\u8FCE\u622A\u56FE\u5206\u4EAB\u7ED9\u670B\u53CB\u3002", 120, height - 210);
+  }
+
+  // js/main.js
+  var mode = "home";
+  var quizState = loadSession(window.localStorage);
+  var finalViewModel = null;
+  var shareImageUrl = "";
+  var cachedLastResult = loadLastResult(window.localStorage);
+  var app = document.querySelector("#app");
+  var bgCanvas = document.querySelector("#bg-canvas");
+  var shareCanvas = document.querySelector("#share-canvas");
+  startBackground(bgCanvas);
+  function computeResultViewModel() {
+    if (quizState.currentQuestionIndex === 0 && cachedLastResult?.result && cachedLastResult?.auxiliaryCode) {
+      return {
+        result: cachedLastResult.result,
+        typeCode: cachedLastResult.typeCode,
+        auxiliaryCode: cachedLastResult.auxiliaryCode,
+        auxiliaryText: AUXILIARY_COPY[cachedLastResult.auxiliaryCode] ?? ""
+      };
+    }
+    const typeCode = resolveTypeCode(quizState.scores);
+    const auxiliaryCode = resolveAuxiliaryCode(quizState.scores);
+    const result2 = resolveResultByType(RESULTS, typeCode) ?? RESULTS[0];
+    return {
+      result: result2,
+      typeCode,
+      auxiliaryCode,
+      auxiliaryText: AUXILIARY_COPY[auxiliaryCode] ?? ""
+    };
+  }
+  function determineInitialMode() {
+    if (quizState.currentQuestionIndex > 0 && quizState.currentQuestionIndex < QUESTIONS.length) {
+      return "quiz";
+    }
+    if (quizState.currentQuestionIndex >= QUESTIONS.length) {
+      return "result";
+    }
+    return cachedLastResult ? "result" : "home";
+  }
+  function render() {
+    if (!app) {
+      return;
+    }
+    if (mode === "home") {
+      app.innerHTML = renderHomeView({ completedCount: RESULTS.length });
+      return;
+    }
+    if (mode === "quiz") {
+      const safeIndex = Math.min(
+        quizState.currentQuestionIndex,
+        QUESTIONS.length - 1
+      );
+      app.innerHTML = renderQuizView({
+        index: safeIndex,
+        total: QUESTIONS.length,
+        question: QUESTIONS[safeIndex]
+      });
+      return;
+    }
+    finalViewModel = computeResultViewModel();
+    cachedLastResult = {
+      typeCode: finalViewModel.typeCode,
+      auxiliaryCode: finalViewModel.auxiliaryCode,
+      result: finalViewModel.result
+    };
+    saveLastResult(window.localStorage, cachedLastResult);
+    app.innerHTML = renderResultView(finalViewModel);
+  }
+  function renderError(message) {
+    if (!app) {
+      return;
+    }
+    app.innerHTML = renderErrorView(message);
+  }
+  function closeShareOverlay() {
+    const overlay = document.querySelector(".overlay-backdrop");
+    if (overlay) {
+      overlay.remove();
+    }
+  }
+  function triggerDownload(fileName, href) {
+    const link = document.createElement("a");
+    link.download = fileName;
+    link.href = href;
+    link.click();
+  }
+  function openShare() {
+    if (!finalViewModel || !shareCanvas) {
+      return;
+    }
+    const ctx = shareCanvas.getContext("2d");
+    if (!ctx) {
+      return;
+    }
+    const model = buildShareCardModel(finalViewModel);
+    const image = new Image();
+    const finish = (iconImage) => {
+      drawShareCard(ctx, model, iconImage);
+      shareImageUrl = shareCanvas.toDataURL("image/png");
+      closeShareOverlay();
+      document.body.insertAdjacentHTML(
+        "beforeend",
+        renderShareOverlay({ resultName: model.title })
+      );
+      const preview = document.querySelector("#share-preview-image");
+      if (preview) {
+        preview.src = shareImageUrl;
+      }
+    };
+    image.onload = () => finish(image);
+    image.onerror = () => finish(null);
+    image.src = "./icon.png";
+  }
+  document.addEventListener("click", (event) => {
+    const target = event.target.closest("[data-action], [data-option-key]");
+    if (!target) {
+      return;
+    }
+    if (target.dataset.action === "start-quiz") {
+      quizState = createInitialState();
+      saveSession(window.localStorage, quizState);
+      cachedLastResult = null;
+      shareImageUrl = "";
+      mode = "quiz";
+      render();
+      return;
+    }
+    if (target.dataset.optionKey) {
+      const question2 = QUESTIONS[quizState.currentQuestionIndex];
+      if (!question2) {
+        return;
+      }
+      quizState = answerQuestion(
+        quizState,
+        QUESTIONS,
+        question2.id,
+        target.dataset.optionKey
+      );
+      saveSession(window.localStorage, quizState);
+      mode = quizState.currentQuestionIndex >= QUESTIONS.length ? "result" : "quiz";
+      render();
+      return;
+    }
+    if (target.dataset.action === "go-back") {
+      quizState = goBackOneQuestion(quizState, QUESTIONS);
+      saveSession(window.localStorage, quizState);
+      render();
+      return;
+    }
+    if (target.dataset.action === "restart-quiz") {
+      quizState = createInitialState();
+      clearSession(window.localStorage);
+      closeShareOverlay();
+      shareImageUrl = "";
+      mode = "home";
+      render();
+      return;
+    }
+    if (target.dataset.action === "open-share") {
+      openShare();
+      return;
+    }
+    if (target.dataset.action === "download-share" && shareImageUrl) {
+      const fileName = `maobti-${finalViewModel?.result.name ?? "share"}.png`;
+      triggerDownload(fileName, shareImageUrl);
+      return;
+    }
+    if (target.dataset.action === "close-share") {
+      closeShareOverlay();
+      return;
+    }
+    if (target.dataset.action === "reload-app") {
+      window.location.reload();
+    }
+  });
+  mode = determineInitialMode();
+  try {
+    render();
+  } catch (error) {
+    console.error(error);
+    renderError("\u54CE\u5440\uFF0C\u51FA\u9519\u4E86\uFF0C\u8BF7\u91CD\u542F\u8BD5\u8BD5\u5427~");
+  }
+})();

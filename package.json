@@ -1,0 +1,12 @@
+{
+  "name": "maobti-core-test",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test",
+    "build:bundle": "node ./scripts/build-bundle.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.0"
+  }
+}
