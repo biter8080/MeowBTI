@@ -905,24 +905,48 @@ h2 {
 
 .option-button {
   display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  width: 100%;
+  padding: 16px 18px;
+  border: 1px solid rgba(125, 84, 40, 0.12);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--ink);
+  text-align: left;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    background 160ms ease;
+}
+
+.option-button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(255, 179, 0, 0.4);
+  box-shadow: 0 14px 26px rgba(94, 61, 25, 0.1);
+}
+
+.option-content {
+  display: flex;
   align-items: flex-start;
   gap: 12px;
-  padding: clamp(12px, 2.1vw, 18px) clamp(12px, 2.2vw, 18px);
-  background: #fff;
-  text-align: left;
-  border: 1px solid rgba(125, 84, 40, 0.08);
-  box-shadow: 0 8px 20px rgba(94, 61, 25, 0.06);
+  min-width: 0;
+  flex: 1 1 auto;
 }
 
 .option-key {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  flex: 0 0 auto;
   width: 32px;
   height: 32px;
   border-radius: 50%;
   background: rgba(255, 207, 69, 0.22);
-  font-weight: 800;
+  font-weight: 900;
+  color: #8c5b26;
   transition:
     transform 180ms ease,
     background 180ms ease,
@@ -930,11 +954,38 @@ h2 {
 }
 
 .option-copy {
-  flex: 1;
-  line-height: 1.5;
   min-width: 0;
+  font-weight: 700;
+  line-height: 1.5;
   overflow-wrap: anywhere;
   word-break: break-word;
+}
+
+.option-figure {
+  flex: 0 0 86px;
+  width: 86px;
+  height: 86px;
+  display: grid;
+  place-items: center;
+}
+
+.option-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+@media (max-width: 420px) {
+  .option-button {
+    padding: 14px 16px;
+  }
+
+  .option-figure {
+    flex-basis: 72px;
+    width: 72px;
+    height: 72px;
+  }
 }
 
 .tagline,

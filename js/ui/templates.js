@@ -88,7 +88,7 @@ function renderHomeView({ completedCount, unlockedCount }) {
         <div class="hero-copy">
           <p class="eyebrow">离线猫格测试</p>
           <h1>测测今天的<br /><span>喵BTI</span></h1>
-          <p class="subtitle">24题轻松测试，发现你的猫猫人格！</p>
+          <p class="subtitle">25题轻松测试，发现你的猫猫人格！</p>
           <div class="trait-row" aria-label="测试特点">
             <span>有趣</span>
             <span>治愈</span>
@@ -158,14 +158,25 @@ function renderHomeView({ completedCount, unlockedCount }) {
 
 function renderQuizView({ index, total, question }) {
   const optionsMarkup = question.options
-    .map(
-      (option) => `
+    .map((option) => {
+      const imageMarkup = option.image
+        ? `
+          <span class="option-figure" aria-hidden="true">
+            <img class="option-image" src="${option.image}" alt="" />
+          </span>
+        `
+        : "";
+
+      return `
         <button type="button" class="option-button" data-option-key="${option.key}">
-          <span class="option-key">${option.key}</span>
-          <span class="option-copy">${option.text}</span>
+          <span class="option-content">
+            <span class="option-key">${option.key}</span>
+            <span class="option-copy">${option.text}</span>
+          </span>
+          ${imageMarkup}
         </button>
-      `
-    )
+      `;
+    })
     .join("");
 
   return `
