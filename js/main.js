@@ -178,10 +178,11 @@ function determineInitialMode() {
   }
 
   if (quizState.currentQuestionIndex >= QUESTIONS.length) {
-    return "result";
+    quizState = createInitialState();
+    clearSession(appStorage);
   }
 
-  return cachedLastResult ? "result" : "home";
+  return "home";
 }
 
 function buildCollectionItems() {

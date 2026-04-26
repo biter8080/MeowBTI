@@ -172,7 +172,10 @@ function renderQuizView({ index, total, question }) {
     <section class="panel quiz-card">
       <div class="progress-meta">
         <span>${index + 1} / ${total}</span>
-        <button type="button" class="link-button" data-action="go-back">上一题</button>
+        <div class="quiz-actions" aria-label="测试导航操作">
+          <button type="button" class="link-button" data-action="go-home">返回首页</button>
+          <button type="button" class="link-button" data-action="go-back">上一题</button>
+        </div>
       </div>
       <div class="progress-bar"><i style="width:${((index + 1) / total) * 100}%"></i></div>
       <h2>${question.prompt}</h2>

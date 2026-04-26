@@ -48,6 +48,7 @@ test("renderQuizView includes question progress and four choices", () => {
   });
 
   assert.match(html, /1 \/ 24/);
+  assert.match(html, /返回首页/);
   assert.equal((html.match(/data-option-key=/g) || []).length, 4);
 });
 
