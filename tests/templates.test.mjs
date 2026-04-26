@@ -20,7 +20,8 @@ const {
   renderGamePlayView,
   renderInviteView,
   renderProfileView,
-  renderCommunityPostView
+  renderCommunityPostView,
+  renderShareWindowDocument
 } = await loadAppScripts();
 
 test("renderHomeView renders CTA and disclaimer copy", () => {
@@ -102,6 +103,23 @@ test("renderResultView includes result title, auxiliary copy and actions", () =>
   assert.doesNotMatch(html, /share-line/);
 });
 
+test("renderResultView splits long descriptions into multiple paragraphs", () => {
+  const html = renderResultView({
+    result: {
+      id: "01",
+      name: "权威猫",
+      tagline: "不一定最显眼，但天然带着让人信服的稳定感",
+      description:
+        "你身上最突出的东西，未必是强势，而是一种很难被忽视的判断力。你对局面、节奏、边界和轻重缓急有一种天然敏感。很多人还停留在有点乱的感觉里时，你往往已经在心里把事情分出了先后。你不一定喜欢高调地主导一切，但你很难真正接受失控。",
+      shareText: "很合理。"
+    },
+    auxiliaryText: "你看起来很稳，其实很多东西都被你默默扛住了。",
+    resultImage: null
+  });
+
+  assert.ok((html.match(/class="description"/g) || []).length >= 2);
+});
+
 test("renderResultView keeps the requested action order", () => {
   const html = renderResultView({
     result: {
@@ -121,7 +139,7 @@ test("renderResultView keeps the requested action order", () => {
   assert.ok(html.indexOf("返回首页") < html.indexOf("适合你的猫薄荷"));
 });
 
-test("renderResultView places meme image before result title", () => {
+test("renderResultView keeps the poster image and removes the duplicate top title", () => {
   const html = renderResultView({
     result: {
       id: "06",
@@ -137,9 +155,9 @@ test("renderResultView places meme image before result title", () => {
     }
   });
 
-  assert.match(html, /你的猫BTI结果是/);
   assert.match(html, /<img[^>]*学习猫 meme 图/);
-  assert.ok(html.indexOf("学习猫 meme 图") < html.indexOf("<h1>学习猫<\/h1>"));
+  assert.match(html, /我的猫猫人格是/);
+  assert.doesNotMatch(html, /你的猫BTI结果是/);
 });
 
 test("renderResultView omits image card when result image is unavailable", () => {
@@ -311,9 +329,42 @@ test("renderCollectionLockedOverlay explains the locked state", () => {
 test("renderShareOverlay includes preview and screenshot guidance", () => {
   const html = renderShareOverlay({ resultName: "学习猫" });
   assert.match(html, /分享图预览/);
-  assert.match(html, /请直接截图保存/);
-  assert.doesNotMatch(html, /保存图片/);
+  assert.match(html, /直接截图保存/);
+  assert.match(html, /share-preview-frame/);
+  assert.doesNotMatch(html, /share-preview-image/);
   assert.match(html, /关闭/);
+});
+
+test("renderShareWindowDocument renders the new standalone share page", () => {
+  const html = renderShareWindowDocument({
+    result: {
+      id: "02",
+      name: "打工猫",
+      tagline: "当代互联网优秀打工喵代表",
+      description: "你是努力生活的打工猫，表面淡定从容，内心 OS 一万句。",
+      shareText: "嘴上想下班，行动上最能扛。"
+    },
+    auxiliaryText: "你很会把现实接住，也很需要自己的回血时刻。",
+    resultImage: {
+      src: "./resources/personalities-main/05 打工猫.png",
+      alt: "打工猫主视觉"
+    },
+    iconSrc: "./icon.png",
+    baseHref: "file:///d:/Develop/Project/work_hks/index.html",
+    dateText: "2026.04.26"
+  });
+
+  assert.match(html, /<!doctype html>/i);
+  assert.match(html, /打工猫/);
+  assert.match(html, /当代互联网优秀打工喵代表/);
+  assert.match(html, /喵BTI报告/);
+  assert.match(html, /人格关键词/);
+  assert.match(html, /能量分布/);
+  assert.match(html, /你的猫薄荷/);
+  assert.ok((html.match(/<p>[^<]*<\/p>/g) || []).length >= 3);
+  assert.doesNotMatch(html, /我的猫猫人格是/);
+  assert.match(html, /resources\/personalities-main\/05 打工猫\.png/);
+  assert.match(html, /<base href="file:\/\/\/d:\/Develop\/Project\/work_hks\/index\.html"/);
 });
 
 test("renderErrorView prints the approved friendly fallback copy", () => {

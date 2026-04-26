@@ -4,10 +4,8 @@ const {
   QUESTIONS,
   RESULTS,
   answerQuestion,
-  buildShareCardModel,
   clearSession,
   createInitialState,
-  drawShareCard,
   getResultImagePath,
   goBackOneQuestion,
   loadCollection,
@@ -31,6 +29,7 @@ const {
   renderBottomTabbar,
   renderResultView,
   renderShareOverlay,
+  renderShareWindowDocument,
   renderTestsView,
   resolveAuxiliaryCode,
   resolveResultByType,
@@ -72,7 +71,6 @@ const appStorage = getStorage();
 let mode = "home";
 let quizState = loadSession(appStorage);
 let finalViewModel = null;
-let shareImageUrl = "";
 let cachedLastResult = loadLastResult(appStorage);
 let collectionState = loadCollection(appStorage);
 let communityPostId = "cat-meme";
@@ -81,7 +79,6 @@ const hiddenResultImages = new Set();
 
 const app = document.querySelector("#app");
 const bgCanvas = document.querySelector("#bg-canvas");
-const shareCanvas = document.querySelector("#share-canvas");
 
 startBackground(bgCanvas);
 
@@ -102,27 +99,6 @@ const MODE_ORDER = [
   "profile",
   "invite"
 ];
-
-const SHARE_CAT_ICON_DATA_URI = `data:image/svg+xml;utf8,${encodeURIComponent(`
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320">
-  <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#ffe9c8"/>
-      <stop offset="100%" stop-color="#ffd29e"/>
-    </linearGradient>
-  </defs>
-  <rect width="320" height="320" rx="44" fill="url(#bg)"/>
-  <circle cx="160" cy="184" r="96" fill="#ffe1bf"/>
-  <path d="M84 124 126 72l22 62z" fill="#f3b98a"/>
-  <path d="M236 124 194 72l-22 62z" fill="#f3b98a"/>
-  <circle cx="122" cy="184" r="12" fill="#2f1f12"/>
-  <circle cx="198" cy="184" r="12" fill="#2f1f12"/>
-  <path d="M160 205 148 220h24z" fill="#f08ca0"/>
-  <path d="M122 222c18 16 58 16 76 0" stroke="#2f1f12" stroke-width="8" stroke-linecap="round" fill="none"/>
-  <circle cx="74" cy="84" r="16" fill="#ffffff" fill-opacity="0.22"/>
-  <circle cx="258" cy="72" r="12" fill="#ffffff" fill-opacity="0.2"/>
-</svg>
-`)}`;
 
 function getRenderDirection(nextMode) {
   if (!lastRenderedMode || lastRenderedMode === nextMode) {
@@ -397,10 +373,6 @@ function closeCollectionLockedOverlay() {
 }
 
 function openShare() {
-  if (!shareCanvas) {
-    return;
-  }
-
   if (!finalViewModel) {
     finalViewModel = computeResultViewModel();
   }
@@ -409,89 +381,30 @@ function openShare() {
     return;
   }
 
-  const model = buildShareCardModel(finalViewModel);
-  const logoImage = new Image();
-  const resultImage = new Image();
-  const memeImage = new Image();
-  const fallbackImage = new Image();
-  const resourceImageSrc = getResultImagePath(finalViewModel.result);
-  const memeImageSrc = "./resources/今日猫meme/猫meme分享_1_露露凯蒂_来自小红书网页版.jpg";
-  const isFileProtocol =
-    typeof window !== "undefined" && window.location?.protocol === "file:";
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  const shareDocument = renderShareWindowDocument({
+    result: finalViewModel.result,
+    auxiliaryText: finalViewModel.auxiliaryText,
+    resultImage: finalViewModel.resultImage || buildResultImage(finalViewModel.result),
+    iconSrc: "./icon.png",
+    baseHref: window.location.href,
+    dateText: `${year}.${month}.${day}`
+  });
 
-  function renderAndExport(images) {
-    const ctx = shareCanvas.getContext("2d");
-    if (!ctx) {
-      throw new Error("share canvas context unavailable");
-    }
+  closeCommunityOverlay();
+  closeShareOverlay();
+  document.body.insertAdjacentHTML(
+    "beforeend",
+    renderShareOverlay({ resultName: finalViewModel.result.name })
+  );
 
-    drawShareCard(ctx, model, images);
-    return shareCanvas.toDataURL("image/png");
+  const previewFrame = document.querySelector("#share-preview-frame");
+  if (previewFrame) {
+    previewFrame.srcdoc = shareDocument;
   }
-
-  const finish = (images) => {
-    try {
-      try {
-        shareImageUrl = renderAndExport(images);
-      } catch (exportError) {
-        if (images?.logoImage || images?.resultImage || images?.memeImage) {
-          shareCanvas.width = shareCanvas.width;
-          shareCanvas.height = shareCanvas.height;
-          shareImageUrl = renderAndExport({});
-        } else {
-          throw exportError;
-        }
-      }
-      closeCommunityOverlay();
-      closeShareOverlay();
-      document.body.insertAdjacentHTML(
-        "beforeend",
-        renderShareOverlay({ resultName: model.title })
-      );
-      const preview = document.querySelector("#share-preview-image");
-      if (preview) {
-        preview.src = shareImageUrl;
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  function loadImage(image, src) {
-    return new Promise((resolve) => {
-      if (!src) {
-        resolve(null);
-        return;
-      }
-
-      image.onload = () => resolve(image);
-      image.onerror = () => resolve(null);
-      image.src = src;
-    });
-  }
-
-  async function prepareAndFinish() {
-    const [loadedResultImage, loadedLogoImage, loadedMemeImage] = await Promise.all([
-      loadImage(resultImage, resourceImageSrc),
-      loadImage(logoImage, "./icon.png"),
-      loadImage(memeImage, memeImageSrc)
-    ]);
-
-    finish({
-      resultImage: loadedResultImage,
-      logoImage: loadedLogoImage,
-      memeImage: loadedMemeImage
-    });
-  }
-
-  if (isFileProtocol) {
-    fallbackImage.onload = () => finish({ logoImage: fallbackImage });
-    fallbackImage.onerror = () => finish({});
-    fallbackImage.src = SHARE_CAT_ICON_DATA_URI;
-    return;
-  }
-
-  prepareAndFinish().catch(() => finish({}));
 }
 
 function scrollCommunityGallery(direction) {
@@ -537,7 +450,6 @@ document.addEventListener("click", (event) => {
     quizState = createInitialState();
     saveSession(appStorage, quizState);
     cachedLastResult = null;
-    shareImageUrl = "";
     mode = "quiz";
     render();
     return;
@@ -675,7 +587,6 @@ document.addEventListener("click", (event) => {
     saveSession(appStorage, quizState);
     closeCommunityOverlay();
     closeShareOverlay();
-    shareImageUrl = "";
     mode = "quiz";
     render();
     return;

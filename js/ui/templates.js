@@ -197,6 +197,60 @@ function renderBottomTabbar(activeTab, testAction = "open-tests", label = "底�
   return renderDockNav({ activeTab, testAction, label });
 }
 
+function splitNarrativeParagraphs(text) {
+  const normalized = String(text ?? "")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  if (!normalized) {
+    return [];
+  }
+
+  const sentences = normalized.match(/[^。！？!?]+[。！？!?]?/g) || [normalized];
+  const paragraphs = [];
+  let current = "";
+
+  sentences.forEach((sentence) => {
+    const nextSentence = sentence.trim();
+    if (!nextSentence) {
+      return;
+    }
+
+    if (!current) {
+      current = nextSentence;
+      return;
+    }
+
+    if (current.length >= 72 || current.length + nextSentence.length > 96) {
+      paragraphs.push(current);
+      current = nextSentence;
+      return;
+    }
+
+    current += nextSentence;
+  });
+
+  if (current) {
+    paragraphs.push(current);
+  }
+
+  while (paragraphs.length > 4) {
+    const last = paragraphs.pop();
+    paragraphs[paragraphs.length - 1] += last;
+  }
+
+  return paragraphs;
+}
+
+function renderNarrativeParagraphs(text, className) {
+  const paragraphs = splitNarrativeParagraphs(text);
+  const safeParagraphs = paragraphs.length ? paragraphs : [String(text ?? "").trim()].filter(Boolean);
+
+  return safeParagraphs
+    .map((paragraph) => `<p class="${className}">${paragraph}</p>`)
+    .join("");
+}
+
 function renderResultView({ result, auxiliaryText, resultImage }) {
   const idSeed = Number(result.id) || 1;
   const keywordPool = [
@@ -267,21 +321,10 @@ function renderResultView({ result, auxiliaryText, resultImage }) {
         <img class="result-poster-hero-image" src="./resources/personalities-main/16 可爱喵.png" alt="猫格海报图" />
       </figure>
     `;
+  const descriptionMarkup = renderNarrativeParagraphs(result.description, "description");
 
   return `
     <section class="panel result-card result-card-flow result-poster-card">
-      <header class="result-report-head" aria-label="结果海报头图">
-        ${imageMarkup}
-        <div>
-          <p class="eyebrow">你的猫BTI结果是</p>
-          <h1>${result.name}</h1>
-          <p class="tagline">${result.tagline}</p>
-        </div>
-        <div class="result-report-logo" aria-hidden="true">
-          <img src="./icon.png" alt="" />
-        </div>
-      </header>
-
       <div class="result-report-layout">
         <section class="result-report-main" aria-label="海报主视觉">
           <section class="result-main-poster" aria-label="猫格海报">
@@ -299,7 +342,7 @@ function renderResultView({ result, auxiliaryText, resultImage }) {
           </section>
 
           <div class="result-copy-body">
-            <p class="description">${result.description}</p>
+            ${descriptionMarkup}
             <p class="auxiliary">${auxiliaryText}</p>
             <p class="meta result-saved-note">已收录进你的图鉴</p>
           </div>
@@ -458,7 +501,7 @@ function renderCollectionDetailOverlay({ result, resultImage }) {
         ${imageMarkup}
         <h2>${result.name}</h2>
         <p class="tagline">${result.tagline}</p>
-        <p class="description">${result.description}</p>
+        ${renderNarrativeParagraphs(result.description, "description")}
         <div class="result-actions">
           <button type="button" data-action="close-collection-detail">关闭</button>
         </div>
@@ -917,13 +960,18 @@ function renderShareOverlay({ resultName }) {
       <section class="panel share-overlay share-overlay-poster" aria-label="分享图预览">
         <p class="eyebrow">分享图已生成</p>
         <h2>${resultName}</h2>
-        <p class="subtitle">请直接截图保存，把你的猫格发给朋友看看。</p>
+        <p class="subtitle">就在这里直接截图保存，手机里看更方便。</p>
         <div class="share-preview">
-          <img id="share-preview-image" alt="${resultName} 分享图预览" />
+          <iframe
+            id="share-preview-frame"
+            title="${resultName} 分享图预览"
+            loading="lazy"
+            referrerpolicy="no-referrer"
+          ></iframe>
         </div>
         <div class="share-note-row" aria-label="截图提示">
           <img src="./resources/quiz-options/q01/a.png" alt="" />
-          <p>建议在全屏模式下截图，分享到朋友圈/群聊更清晰。</p>
+          <p>上下滑动看完整张图，停在喜欢的位置直接截图就行。</p>
           <img src="./resources/quiz-options/q01/d.png" alt="" />
         </div>
         <div class="result-actions">
@@ -931,6 +979,748 @@ function renderShareOverlay({ resultName }) {
         </div>
       </section>
     </div>
+  `;
+}
+
+function escapeShareHtml(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function renderShareWindowDocument({
+  result,
+  auxiliaryText = "",
+  resultImage,
+  iconSrc = "./icon.png",
+  baseHref = "./",
+  dateText = ""
+}) {
+  const idSeed = Number(result?.id) || 1;
+  const safeResultName = escapeShareHtml(result?.name || "猫猫人格");
+  const safeTagline = escapeShareHtml(result?.tagline || "");
+  const safeDescription = escapeShareHtml(result?.description || "");
+  const safeAuxiliary = escapeShareHtml(auxiliaryText || "");
+  const safeIconSrc = escapeShareHtml(iconSrc);
+  const safeBaseHref = escapeShareHtml(baseHref);
+  const safeDateText = escapeShareHtml(dateText || "");
+  const heroImageSrc = escapeShareHtml(resultImage?.src || "./resources/personalities-main/16 可爱喵.png");
+  const heroImageAlt = escapeShareHtml(resultImage?.alt || `${safeResultName} 形象图`);
+  const safeDescriptionMarkup = splitNarrativeParagraphs(result?.description)
+    .map((paragraph) => `<p>${escapeShareHtml(paragraph)}</p>`)
+    .join("");
+
+  const keywordPool = [
+    "责任感强",
+    "情绪稳定",
+    "独立自主",
+    "执行在线",
+    "反差萌",
+    "社交有梗",
+    "内心细腻",
+    "恢复力高"
+  ];
+  const keywords = Array.from(
+    { length: 5 },
+    (_, index) => keywordPool[(idSeed + index * 2) % keywordPool.length]
+  );
+
+  const metrics = [
+    ["社交能量", 45 + (idSeed * 7) % 45],
+    ["执行力", 52 + (idSeed * 9) % 40],
+    ["情绪复原", 40 + (idSeed * 11) % 45],
+    ["稳定指数", 46 + (idSeed * 13) % 42],
+    ["创意指数", 44 + (idSeed * 15) % 44]
+  ];
+
+  const similarCats = [
+    ["摆烂猫", 92 - (idSeed % 8), "./resources/personalities-main/10 命苦猫.png"],
+    ["学习猫", 85 - (idSeed % 6), "./resources/personalities-main/04 学习猫.png"],
+    ["社恐猫", 65 - (idSeed % 10), "./resources/personalities-main/15 落汤喵.png"]
+  ];
+
+  const catnipCards = [
+    ["打工人下班后的治愈时刻", "12.3w", "./resources/今日猫meme/猫meme分享_1_露露凯蒂_来自小红书网页版.jpg"],
+    ["当代打工人真实写照", "8.7w", "./resources/当家里的小咪有了手机/当家里的小咪有了手机1️⃣_2_为什么小狗不用上学_来自小红书网页版.jpg"],
+    ["摸鱼的100种方式", "6.9w", "./resources/今日猫meme/猫meme分享_3_露露凯蒂_来自小红书网页版.jpg"]
+  ];
+
+  const keywordMarkup = keywords
+    .map((keyword) => `<span class="share-pill">${escapeShareHtml(keyword)}</span>`)
+    .join("");
+
+  const metricMarkup = metrics
+    .map(
+      ([label, value]) => `
+        <div class="share-metric-row">
+          <div class="share-metric-label">
+            <span>${escapeShareHtml(label)}</span>
+            <strong>${value}%</strong>
+          </div>
+          <div class="share-metric-track"><i style="width:${value}%"></i></div>
+        </div>
+      `
+    )
+    .join("");
+
+  const similarMarkup = similarCats
+    .map(
+      ([name, score, image], index) => `
+        <div class="share-similar-item">
+          <span class="share-rank">${index + 1}</span>
+          <img src="${escapeShareHtml(image)}" alt="${escapeShareHtml(name)}" />
+          <strong>${escapeShareHtml(name)}</strong>
+          <em>${score}%</em>
+        </div>
+      `
+    )
+    .join("");
+
+  const catnipMarkup = catnipCards
+    .map(
+      ([title, heat, image]) => `
+        <article class="share-video-card">
+          <div class="share-video-cover">
+            <img src="${escapeShareHtml(image)}" alt="${escapeShareHtml(title)}" />
+            <span class="share-play">▶</span>
+          </div>
+          <h4>${escapeShareHtml(title)}</h4>
+          <p>♡ ${escapeShareHtml(heat)}</p>
+        </article>
+      `
+    )
+    .join("");
+
+  return `
+    <!doctype html>
+    <html lang="zh-CN">
+      <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <base href="${safeBaseHref}" />
+        <title>${safeResultName} | 喵BTI 分享图</title>
+        <style>
+          :root {
+            --bg: #f6dfaa;
+            --paper: #fffaf1;
+            --panel: #fffdf8;
+            --line: rgba(181, 142, 68, 0.18);
+            --ink: #5b3416;
+            --subtle: #8f6840;
+            --accent: #f3a437;
+            --accent-soft: #ffe7aa;
+            --shadow: 0 24px 60px rgba(123, 84, 28, 0.16);
+          }
+
+          * { box-sizing: border-box; }
+          html, body { margin: 0; min-height: 100%; }
+          body {
+            font-family: "Segoe UI", "PingFang SC", sans-serif;
+            background:
+              radial-gradient(circle at top left, rgba(255, 243, 205, 0.95), transparent 28rem),
+              linear-gradient(180deg, #f5dfae 0%, #f8e8c7 100%);
+            color: var(--ink);
+          }
+
+          .share-page {
+            max-width: 1260px;
+            margin: 0 auto;
+            padding: 20px;
+          }
+
+          .share-shell {
+            display: grid;
+            grid-template-columns: minmax(0, 1.55fr) minmax(290px, 0.82fr);
+            gap: 18px;
+            align-items: start;
+          }
+
+          .share-col {
+            background: rgba(255, 250, 241, 0.96);
+            border: 1px solid rgba(214, 183, 128, 0.48);
+            border-radius: 26px;
+            box-shadow: var(--shadow);
+            padding: 16px;
+          }
+
+          .share-main-hero {
+            position: relative;
+            overflow: hidden;
+            border-radius: 24px;
+            background:
+              radial-gradient(circle at 14% 16%, rgba(255, 243, 208, 0.95), transparent 10rem),
+              radial-gradient(circle at 92% 8%, rgba(255, 233, 180, 0.8), transparent 8rem),
+              linear-gradient(180deg, #fffdf8 0%, #fff6df 100%);
+            border: 1px solid var(--line);
+            padding: 22px 22px 18px;
+          }
+
+          .share-brand {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+          }
+
+          .share-brand-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+          }
+
+          .share-brand-left img,
+          .share-footer-brand img {
+            width: 56px;
+            height: 56px;
+            object-fit: cover;
+            border-radius: 18px;
+          }
+
+          .share-brand-copy strong {
+            display: block;
+            font-size: 17px;
+            font-weight: 900;
+          }
+
+          .share-brand-copy span,
+          .share-stamp span {
+            color: var(--subtle);
+            font-size: 12px;
+            font-weight: 700;
+          }
+
+          .share-stamp {
+            width: 92px;
+            height: 92px;
+            border: 3px solid rgba(214, 147, 52, 0.55);
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            transform: rotate(-10deg);
+            text-align: center;
+            color: #cf8d30;
+            background: rgba(255, 252, 246, 0.84);
+          }
+
+          .share-stamp strong {
+            display: block;
+            font-size: 20px;
+            font-weight: 900;
+          }
+
+          .share-hero-tagline {
+            margin: 14px 0 0;
+            color: #8a6237;
+            font-size: 26px;
+            line-height: 1.5;
+            font-weight: 900;
+          }
+
+          .share-illustration {
+            position: relative;
+            margin-top: 16px;
+            padding: 18px;
+            border-radius: 28px;
+            background:
+              radial-gradient(circle at 80% 12%, rgba(255, 255, 255, 0.75), transparent 7rem),
+              linear-gradient(180deg, #fff1c8 0%, #ffe9bc 100%);
+            min-height: 520px;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 190px;
+            gap: 12px;
+            align-items: end;
+          }
+
+          .share-sticky-notes {
+            position: absolute;
+            left: 18px;
+            top: 22px;
+            display: grid;
+            gap: 10px;
+          }
+
+          .share-note {
+            width: 126px;
+            padding: 12px 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            line-height: 1.5;
+            font-weight: 800;
+            color: #72512c;
+            box-shadow: 0 10px 24px rgba(155, 117, 62, 0.12);
+          }
+
+          .share-note.green { background: #dfeea8; transform: rotate(-7deg); }
+          .share-note.pink { background: #ffd8d7; transform: rotate(-9deg); margin-left: 14px; }
+
+          .share-cat-wrap {
+            display: flex;
+            align-items: end;
+            justify-content: center;
+            min-height: 100%;
+            padding-top: 64px;
+          }
+
+          .share-cat-wrap img {
+            width: 100%;
+            max-width: 440px;
+            object-fit: contain;
+            filter: drop-shadow(0 24px 36px rgba(95, 67, 27, 0.12));
+          }
+
+          .share-bubbles {
+            display: grid;
+            gap: 12px;
+            align-self: start;
+            padding-top: 96px;
+          }
+
+          .share-bubble {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 999px;
+            padding: 16px 18px;
+            font-size: 16px;
+            line-height: 1.45;
+            font-weight: 800;
+            text-align: center;
+            color: #6b4a2a;
+            box-shadow: 0 12px 22px rgba(123, 85, 31, 0.1);
+          }
+
+          .share-analysis {
+            margin-top: 14px;
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            padding: 18px;
+          }
+
+          .share-analysis h3,
+          .share-catnip h3,
+          .share-side-card h3 {
+            margin: 0 0 8px;
+            font-size: 32px;
+            font-weight: 900;
+          }
+
+          .share-analysis p,
+          .share-catnip-subtitle,
+          .share-suggestion-list p {
+            margin: 0;
+            color: #68492b;
+            font-size: 18px;
+            line-height: 1.75;
+            font-weight: 700;
+          }
+
+          .share-catnip {
+            margin-top: 14px;
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            padding: 18px;
+          }
+
+          .share-videos {
+            margin-top: 16px;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+          }
+
+          .share-video-card h4,
+          .share-video-card p {
+            margin: 10px 0 0;
+          }
+
+          .share-video-card h4 {
+            font-size: 16px;
+            line-height: 1.4;
+          }
+
+          .share-video-card p {
+            color: #8f6840;
+            font-size: 14px;
+            font-weight: 800;
+          }
+
+          .share-video-cover {
+            position: relative;
+            overflow: hidden;
+            border-radius: 14px;
+            aspect-ratio: 1.52;
+            background: #f6ebcf;
+          }
+
+          .share-video-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+          }
+
+          .share-play {
+            position: absolute;
+            inset: 50% auto auto 50%;
+            transform: translate(-50%, -50%);
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            background: rgba(36, 24, 13, 0.6);
+            color: #fff;
+            font-size: 16px;
+          }
+
+          .share-footer-cta {
+            margin-top: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+            background: rgba(255, 251, 244, 0.96);
+            border: 1px dashed rgba(225, 177, 91, 0.7);
+            border-radius: 18px;
+            padding: 18px;
+          }
+
+          .share-footer-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+          }
+
+          .share-footer-brand strong {
+            display: block;
+            font-size: 18px;
+          }
+
+          .share-footer-brand p,
+          .share-footer-qr p {
+            margin: 2px 0 0;
+            color: #8b6740;
+            font-size: 14px;
+            font-weight: 700;
+          }
+
+          .share-footer-qr {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-align: left;
+          }
+
+          .share-footer-qr-box {
+            width: 88px;
+            height: 88px;
+            border-radius: 16px;
+            padding: 10px;
+            background: linear-gradient(180deg, #fff, #fff7e9);
+            border: 1px solid rgba(224, 188, 118, 0.65);
+            display: grid;
+            place-items: center;
+          }
+
+          .share-footer-qr-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 12px;
+          }
+
+          .share-side-card {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 20px;
+            padding: 18px;
+          }
+
+          .share-side-stack {
+            display: grid;
+            gap: 14px;
+          }
+
+          .share-side-meta {
+            color: #8a6237;
+            font-size: 14px;
+            font-weight: 800;
+          }
+
+          .share-pill-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 12px;
+          }
+
+          .share-pill {
+            padding: 9px 14px;
+            border-radius: 999px;
+            background: linear-gradient(180deg, #fff4d7, #fff0cd);
+            color: #77522e;
+            font-size: 15px;
+            font-weight: 900;
+            border: 1px solid rgba(236, 191, 111, 0.52);
+          }
+
+          .share-metric-stack {
+            margin-top: 8px;
+            display: grid;
+            gap: 12px;
+          }
+
+          .share-metric-label {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            color: #704a25;
+            font-size: 15px;
+            font-weight: 800;
+          }
+
+          .share-metric-track {
+            margin-top: 6px;
+            width: 100%;
+            height: 10px;
+            border-radius: 999px;
+            overflow: hidden;
+            background: #f7e7c6;
+          }
+
+          .share-metric-track i {
+            display: block;
+            height: 100%;
+            border-radius: inherit;
+            background: linear-gradient(90deg, #f4c156, #e8a142);
+          }
+
+          .share-similar-list {
+            display: grid;
+            gap: 12px;
+          }
+
+          .share-similar-item {
+            display: grid;
+            grid-template-columns: 26px 42px minmax(0, 1fr) auto;
+            align-items: center;
+            gap: 10px;
+            color: #704a25;
+            font-size: 16px;
+            font-weight: 800;
+          }
+
+          .share-similar-item img {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #fff3d6;
+          }
+
+          .share-rank {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            background: #ffe5a4;
+            font-size: 14px;
+          }
+
+          .share-similar-item em {
+            font-style: normal;
+            color: #8f6840;
+          }
+
+          .share-suggestion-list {
+            display: grid;
+            gap: 14px;
+          }
+
+          .share-suggestion-item {
+            display: grid;
+            grid-template-columns: 28px minmax(0, 1fr);
+            gap: 10px;
+            align-items: start;
+          }
+
+          .share-suggestion-icon {
+            width: 28px;
+            height: 28px;
+            display: grid;
+            place-items: center;
+            border-radius: 50%;
+            background: #fff1cf;
+            font-size: 16px;
+          }
+
+          .share-side-mascot {
+            position: relative;
+            overflow: hidden;
+            min-height: 212px;
+            display: flex;
+            align-items: end;
+            justify-content: center;
+            background:
+              radial-gradient(circle at 78% 18%, rgba(255, 233, 174, 0.75), transparent 8rem),
+              linear-gradient(180deg, #fff8e8 0%, #ffe9be 100%);
+          }
+
+          .share-side-mascot img {
+            width: min(88%, 220px);
+            object-fit: contain;
+          }
+
+          @media (max-width: 980px) {
+            .share-shell {
+              grid-template-columns: 1fr;
+            }
+
+            .share-illustration {
+              grid-template-columns: 1fr;
+              min-height: auto;
+            }
+
+            .share-bubbles {
+              padding-top: 0;
+              grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+          }
+
+          @media (max-width: 720px) {
+            .share-page { padding: 12px; }
+            .share-col { padding: 12px; border-radius: 20px; }
+            .share-main-hero { padding: 16px; }
+            .share-brand { align-items: start; }
+            .share-stamp { width: 74px; height: 74px; }
+            .share-hero-tagline { font-size: 18px; }
+            .share-videos { grid-template-columns: 1fr; }
+            .share-bubbles { grid-template-columns: 1fr; }
+            .share-footer-cta { flex-direction: column; align-items: flex-start; }
+            .share-footer-qr { width: 100%; }
+          }
+        </style>
+      </head>
+      <body>
+        <main class="share-page">
+          <div class="share-shell">
+            <section class="share-col">
+              <section class="share-main-hero">
+                <div class="share-brand">
+                  <div class="share-brand-left">
+                    <img src="${safeIconSrc}" alt="喵BTI" />
+                    <div class="share-brand-copy">
+                      <strong>喵BTI</strong>
+                      <span>我的猫猫人格分享图</span>
+                    </div>
+                  </div>
+                  <div class="share-stamp">
+                    <div>
+                      <strong>喵BTI</strong>
+                      <span>测试报告</span>
+                    </div>
+                  </div>
+                </div>
+                <p class="share-hero-tagline">${safeTagline}</p>
+                <section class="share-illustration">
+                  <div class="share-sticky-notes" aria-hidden="true">
+                    <div class="share-note green">早睡早起<br />不如早起打工</div>
+                    <div class="share-note pink">只要钱给够<br />周末还能上线</div>
+                  </div>
+                  <div class="share-cat-wrap">
+                    <img src="${heroImageSrc}" alt="${heroImageAlt}" />
+                  </div>
+                  <div class="share-bubbles">
+                    <div class="share-bubble">周一靠咖啡<br />周五靠信念</div>
+                    <div class="share-bubble">喵言喵语里<br />都写着真实人格</div>
+                  </div>
+                </section>
+              </section>
+
+              <section class="share-analysis">
+                <h3>人格解析</h3>
+                ${safeDescriptionMarkup}
+                <p>${safeAuxiliary}</p>
+              </section>
+
+              <section class="share-catnip">
+                <h3>你的猫薄荷</h3>
+                <p class="share-catnip-subtitle">这些内容最能让你快乐充电。</p>
+                <div class="share-videos">${catnipMarkup}</div>
+              </section>
+
+              <section class="share-footer-cta">
+                <div class="share-footer-brand">
+                  <img src="${safeIconSrc}" alt="喵BTI" />
+                  <div>
+                    <strong>快来测测你的猫猫人格吧！</strong>
+                    <p>16 种猫猫人格等你解锁</p>
+                  </div>
+                </div>
+                <div class="share-footer-qr">
+                  <div class="share-footer-qr-box">
+                    <img src="${safeIconSrc}" alt="喵BTI 图标" />
+                  </div>
+                  <div>
+                    <strong>长按识别应用图标</strong>
+                    <p>搜索“喵BTI”继续测测看</p>
+                  </div>
+                </div>
+              </section>
+            </section>
+
+            <aside class="share-col share-side-stack">
+              <section class="share-side-card">
+                <h3>喵BTI报告</h3>
+                <p class="share-side-meta">测试时间：${safeDateText}</p>
+              </section>
+
+              <section class="share-side-card">
+                <h3>人格关键词</h3>
+                <div class="share-pill-row">${keywordMarkup}</div>
+              </section>
+
+              <section class="share-side-card">
+                <h3>能量分布</h3>
+                <div class="share-metric-stack">${metricMarkup}</div>
+              </section>
+
+              <section class="share-side-card">
+                <h3>与你相似的猫猫</h3>
+                <div class="share-similar-list">${similarMarkup}</div>
+              </section>
+
+              <section class="share-side-card">
+                <h3>喵生建议</h3>
+                <div class="share-suggestion-list">
+                  <div class="share-suggestion-item">
+                    <span class="share-suggestion-icon">☕</span>
+                    <p>咖啡可以续命，休息才能充电，记得给自己放个假。</p>
+                  </div>
+                  <div class="share-suggestion-item">
+                    <span class="share-suggestion-icon">🌿</span>
+                    <p>你已经很棒啦，别给自己太大压力，稳定比逞强更重要。</p>
+                  </div>
+                  <div class="share-suggestion-item">
+                    <span class="share-suggestion-icon">💗</span>
+                    <p>生活不止眼前的工位，还有小鱼干和猫薄荷等你回血。</p>
+                  </div>
+                </div>
+              </section>
+
+              <section class="share-side-card share-side-mascot">
+                <img src="./resources/personalities-main/16 可爱喵.png" alt="可爱喵" />
+              </section>
+            </aside>
+          </div>
+        </main>
+      </body>
+    </html>
   `;
 }
 
@@ -963,6 +1753,7 @@ Object.assign(MaoBTI, {
   renderBottomTabbar,
   renderResultView,
   renderShareOverlay,
+  renderShareWindowDocument,
   renderTestsView
 });
 })(globalThis);
