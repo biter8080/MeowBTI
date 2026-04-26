@@ -312,37 +312,13 @@ body {
 .brand-mark {
   display: flex;
   align-items: center;
-  gap: 8px;
-  color: #5d3519;
-  font-weight: 900;
+  min-width: 0;
 }
 
-.brand-word {
-  font-size: clamp(2.2rem, 10vw, 3.5rem);
-  line-height: 1;
-}
-
-.brand-paw {
-  position: relative;
-  width: 44px;
-  height: 38px;
-  color: transparent;
-}
-
-.brand-paw::before {
-  content: "";
-  position: absolute;
-  left: 12px;
-  bottom: 2px;
-  width: 20px;
-  height: 18px;
-  border-radius: 50%;
-  background: #ffd875;
-  box-shadow:
-    -12px -10px 0 -4px #ffd875,
-    0 -17px 0 -5px #ffd875,
-    12px -10px 0 -4px #ffd875;
-  transform: rotate(-16deg);
+.brand-logo {
+  display: block;
+  width: clamp(120px, 28vw, 180px);
+  height: auto;
 }
 
 .top-actions {
@@ -864,6 +840,13 @@ h2 {
 }
 
 .quiz-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  margin-left: auto;
+}
+
+.collection-actions {
   display: inline-flex;
   align-items: center;
   gap: 14px;

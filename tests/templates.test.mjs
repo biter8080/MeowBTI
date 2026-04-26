@@ -90,7 +90,7 @@ test("renderResultView includes result title, auxiliary copy and actions", () =>
   assert.match(html, /打工猫/);
   assert.match(html, /生成分享图/);
   assert.match(html, /我的图鉴/);
-  assert.match(html, /猫薄荷社区/);
+  assert.match(html, /返回首页/);
   assert.match(html, /重新测试/);
   assert.match(html, /已收录进你的图鉴/);
   assert.doesNotMatch(html, /result-hero/);
@@ -113,7 +113,7 @@ test("renderResultView keeps the requested action order", () => {
 
   assert.ok(html.indexOf("生成分享图") < html.indexOf("我的图鉴"));
   assert.ok(html.indexOf("我的图鉴") < html.indexOf("重新测试"));
-  assert.ok(html.indexOf("重新测试") < html.indexOf("猫薄荷社区"));
+  assert.ok(html.indexOf("重新测试") < html.indexOf("返回首页"));
 });
 
 test("renderResultView places meme image before result title", () => {
@@ -184,8 +184,10 @@ test("renderCollectionView renders locked and unlocked catalog cards", () => {
   });
 
   assert.match(html, /我的图鉴/);
+  assert.match(html, /一键解锁/);
   assert.match(html, /已解锁\s*1\s*\/\s*2/);
   assert.equal((html.match(/data-collection-id=/g) || []).length, 2);
+  assert.match(html, /data-collection-id="02"/);
   assert.match(html, /\?\?\?/);
   assert.match(html, /打工猫/);
 });

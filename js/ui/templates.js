@@ -73,8 +73,7 @@ function renderHomeView({ completedCount, unlockedCount }) {
     <section class="home-screen" aria-label="喵BTI首页">
       <header class="home-topbar">
         <div class="brand-mark" aria-label="喵BTI">
-          <span class="brand-word">喵BTI</span>
-          <span class="brand-paw" aria-hidden="true"> paw </span>
+          <img class="brand-logo" src="./icon.png" alt="喵BTI" />
         </div>
         <div class="top-actions" aria-hidden="true">
           <span class="round-icon">✓</span>
@@ -99,7 +98,6 @@ function renderHomeView({ completedCount, unlockedCount }) {
           </button>
         </div>
         <div class="hero-art" aria-hidden="true">
-          <div class="speech-bubble">今天<br />你是什么<br />猫猫呢？</div>
           <img src="./resources/personalities-main/16 可爱喵.png" alt="" />
         </div>
       </section>
@@ -230,7 +228,7 @@ function renderResultView({ result, auxiliaryText, resultImage }) {
         <button type="button" data-action="open-share">生成分享图</button>
         <button type="button" class="ghost-button" data-action="open-collection">我的图鉴</button>
         <button type="button" class="ghost-button" data-action="restart-quiz">重新测试</button>
-        <button type="button" class="ghost-button" data-action="open-community">猫薄荷社区</button>
+        <button type="button" class="ghost-button" data-action="go-home">返回首页</button>
       </div>
     </section>
   `;
@@ -273,7 +271,10 @@ function renderCollectionView({ unlockedCount, totalCount, items }) {
     <section class="panel collection-card">
       <div class="progress-meta">
         <span>我的图鉴</span>
-        <button type="button" class="link-button" data-action="go-home">返回首页</button>
+        <div class="collection-actions" aria-label="图鉴操作">
+          <button type="button" class="link-button" data-action="unlock-all-collection">一键解锁</button>
+          <button type="button" class="link-button" data-action="go-home">返回首页</button>
+        </div>
       </div>
       <p class="meta">已解锁 ${unlockedCount} / ${totalCount}</p>
       <div class="collection-grid">${cardsMarkup}</div>

@@ -173,14 +173,8 @@ function computeResultViewModel() {
 }
 
 function determineInitialMode() {
-  if (quizState.currentQuestionIndex > 0 && quizState.currentQuestionIndex < QUESTIONS.length) {
-    return "quiz";
-  }
-
-  if (quizState.currentQuestionIndex >= QUESTIONS.length) {
-    quizState = createInitialState();
-    clearSession(appStorage);
-  }
+  quizState = createInitialState();
+  clearSession(appStorage);
 
   return "home";
 }
@@ -350,7 +344,15 @@ function triggerDownload(fileName, href) {
 }
 
 function openShare() {
-  if (!finalViewModel || !shareCanvas) {
+  if (!shareCanvas) {
+    return;
+  }
+
+  if (!finalViewModel) {
+    finalViewModel = computeResultViewModel();
+  }
+
+  if (!finalViewModel?.result) {
     return;
   }
 
@@ -363,17 +365,21 @@ function openShare() {
   const image = new Image();
 
   const finish = (iconImage) => {
-    drawShareCard(ctx, model, iconImage);
-    shareImageUrl = shareCanvas.toDataURL("image/png");
-    closeCommunityOverlay();
-    closeShareOverlay();
-    document.body.insertAdjacentHTML(
-      "beforeend",
-      renderShareOverlay({ resultName: model.title })
-    );
-    const preview = document.querySelector("#share-preview-image");
-    if (preview) {
-      preview.src = shareImageUrl;
+    try {
+      drawShareCard(ctx, model, iconImage);
+      shareImageUrl = shareCanvas.toDataURL("image/png");
+      closeCommunityOverlay();
+      closeShareOverlay();
+      document.body.insertAdjacentHTML(
+        "beforeend",
+        renderShareOverlay({ resultName: model.title })
+      );
+      const preview = document.querySelector("#share-preview-image");
+      if (preview) {
+        preview.src = shareImageUrl;
+      }
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -416,7 +422,7 @@ document.addEventListener("pointercancel", () => {
 });
 
 document.addEventListener("click", (event) => {
-  const target = event.target.closest("[data-action], [data-option-key]");
+  const target = event.target.closest("[data-action], [data-option-key], [data-collection-id]");
   if (!target) {
     return;
   }
@@ -560,11 +566,11 @@ document.addEventListener("click", (event) => {
 
   if (target.dataset.action === "restart-quiz") {
     quizState = createInitialState();
-    clearSession(appStorage);
+    saveSession(appStorage, quizState);
     closeCommunityOverlay();
     closeShareOverlay();
     shareImageUrl = "";
-    mode = "home";
+    mode = "quiz";
     render();
     return;
   }
@@ -575,6 +581,18 @@ document.addEventListener("click", (event) => {
     closeCollectionDetailOverlay();
     closeCollectionLockedOverlay();
     mode = "home";
+    render();
+    return;
+  }
+
+  if (target.dataset.action === "unlock-all-collection") {
+    collectionState = {
+      unlockedResultIds: RESULTS.map((result) => result.id)
+    };
+    saveCollection(appStorage, collectionState);
+    closeCollectionDetailOverlay();
+    closeCollectionLockedOverlay();
+    mode = "collection";
     render();
     return;
   }
@@ -623,13 +641,14 @@ document.addEventListener("click", (event) => {
       return;
     }
 
-    document.body.insertAdjacentHTML(
-      "beforeend",
-      renderCollectionDetailOverlay({
-        result,
-        resultImage: buildResultImage(result)
-      })
-    );
+    cachedLastResult = {
+      typeCode: result.typeCode,
+      auxiliaryCode: resolveAuxiliaryCode(createInitialState().scores),
+      result
+    };
+    saveLastResult(appStorage, cachedLastResult);
+    mode = "result";
+    render();
     return;
   }
 
