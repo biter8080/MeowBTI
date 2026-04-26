@@ -193,11 +193,51 @@ function renderQuizView({ index, total, question }) {
   `;
 }
 
-function renderBottomTabbar(activeTab) {
-  return renderDockNav({ activeTab });
+function renderBottomTabbar(activeTab, testAction = "open-tests", label = "底部导航") {
+  return renderDockNav({ activeTab, testAction, label });
 }
 
 function renderResultView({ result, auxiliaryText, resultImage }) {
+  const idSeed = Number(result.id) || 1;
+  const keywordPool = [
+    "责任感强",
+    "情绪稳定",
+    "独立自主",
+    "执行在线",
+    "反差萌",
+    "社交有梗",
+    "内心细腻",
+    "恢复力高"
+  ];
+  const keywords = Array.from({ length: 5 }, (_, index) => keywordPool[(idSeed + index * 2) % keywordPool.length]);
+  const energy = {
+    social: 45 + (idSeed * 7) % 45,
+    action: 52 + (idSeed * 9) % 40,
+    emotion: 40 + (idSeed * 11) % 45,
+    stability: 46 + (idSeed * 13) % 42,
+    creativity: 44 + (idSeed * 15) % 44
+  };
+  const similarCats = [
+    { name: "摆烂猫", score: 90 - (idSeed % 8), image: "./resources/personalities-main/10 命苦猫.png" },
+    { name: "学习猫", score: 86 - (idSeed % 6), image: "./resources/personalities-main/04 学习猫.png" },
+    { name: "社恐猫", score: 72 - (idSeed % 10), image: "./resources/personalities-main/15 落汤喵.png" }
+  ];
+
+  const catnipPosts = [
+    {
+      id: "cat-meme",
+      title: "今日猫meme",
+      copy: "今日份猫猫快乐，拿捏情绪值。",
+      image: "./resources/今日猫meme/猫meme分享_1_露露凯蒂_来自小红书网页版.jpg"
+    },
+    {
+      id: "phone-cat",
+      title: "当家里的小咪有了手机",
+      copy: "小咪上网冲浪实录，笑点密集。",
+      image: "./resources/当家里的小咪有了手机/当家里的小咪有了手机1️⃣_1_为什么小狗不用上学_来自小红书网页版.jpg"
+    }
+  ];
+
   const imageMarkup = resultImage
     ? `
       <figure class="result-image-card">
@@ -211,25 +251,140 @@ function renderResultView({ result, auxiliaryText, resultImage }) {
     `
     : "";
 
+  const posterImageMarkup = resultImage
+    ? `
+      <figure class="result-poster-hero">
+        <img
+          class="result-poster-hero-image"
+          data-result-id="${result.id}"
+          src="${resultImage.src}"
+          alt="${resultImage.alt}"
+        />
+      </figure>
+    `
+    : `
+      <figure class="result-poster-hero">
+        <img class="result-poster-hero-image" src="./resources/personalities-main/16 可爱喵.png" alt="猫格海报图" />
+      </figure>
+    `;
+
   return `
-    <section class="panel result-card result-card-flow">
-      <p class="eyebrow">你的猫BTI结果是</p>
-      ${imageMarkup}
-      <header class="result-copy-head">
-        <h1>${result.name}</h1>
-        <p class="tagline">${result.tagline}</p>
+    <section class="panel result-card result-card-flow result-poster-card">
+      <header class="result-report-head" aria-label="结果海报头图">
+        ${imageMarkup}
+        <div>
+          <p class="eyebrow">你的猫BTI结果是</p>
+          <h1>${result.name}</h1>
+          <p class="tagline">${result.tagline}</p>
+        </div>
+        <div class="result-report-logo" aria-hidden="true">
+          <img src="./icon.png" alt="" />
+        </div>
       </header>
-      <div class="result-copy-body">
-        <p class="description">${result.description}</p>
-        <p class="auxiliary">${auxiliaryText}</p>
-        <p class="meta result-saved-note">已收录进你的图鉴</p>
+
+      <div class="result-report-layout">
+        <section class="result-report-main" aria-label="海报主视觉">
+          <section class="result-main-poster" aria-label="猫格海报">
+            <div class="result-main-title">
+              <p class="eyebrow">喵BTI 测试报告</p>
+              <h2>我的猫猫人格是</h2>
+              <strong>${result.name}</strong>
+              <p>${result.tagline}</p>
+            </div>
+            ${posterImageMarkup}
+            <div class="result-main-stickers" aria-hidden="true">
+              <span>周一靠咖啡<br />周五靠信念</span>
+              <span>只要钱给够<br />周末还能上线</span>
+            </div>
+          </section>
+
+          <div class="result-copy-body">
+            <p class="description">${result.description}</p>
+            <p class="auxiliary">${auxiliaryText}</p>
+            <p class="meta result-saved-note">已收录进你的图鉴</p>
+          </div>
+        </section>
+
+        <aside class="result-report-side" aria-label="报告信息">
+          <section class="result-side-card">
+            <h2>人格关键词</h2>
+            <div class="result-keywords">
+              ${keywords.map((keyword) => `<span>${keyword}</span>`).join("")}
+            </div>
+          </section>
+
+          <section class="result-side-card">
+            <h2>能量分布</h2>
+            <div class="result-meters" aria-label="能量指标">
+              <p><span>社交能量</span><strong>${energy.social}%</strong></p>
+              <i style="width:${energy.social}%"></i>
+              <p><span>执行力</span><strong>${energy.action}%</strong></p>
+              <i style="width:${energy.action}%"></i>
+              <p><span>情绪复原</span><strong>${energy.emotion}%</strong></p>
+              <i style="width:${energy.emotion}%"></i>
+              <p><span>稳定指数</span><strong>${energy.stability}%</strong></p>
+              <i style="width:${energy.stability}%"></i>
+              <p><span>创意指数</span><strong>${energy.creativity}%</strong></p>
+              <i style="width:${energy.creativity}%"></i>
+            </div>
+          </section>
+
+          <section class="result-side-card">
+            <h2>与你相似的猫猫</h2>
+            <div class="result-similar-list">
+              ${similarCats
+                .map(
+                  (item, index) => `
+                    <div>
+                      <span>${index + 1}</span>
+                      <img src="${item.image}" alt="${item.name}" loading="lazy" />
+                      <strong>${item.name}</strong>
+                      <em>${item.score}%</em>
+                    </div>
+                  `
+                )
+                .join("")}
+            </div>
+          </section>
+        </aside>
       </div>
+
       <div class="result-actions">
         <button type="button" data-action="open-share">生成分享图</button>
         <button type="button" class="ghost-button" data-action="open-collection">我的图鉴</button>
         <button type="button" class="ghost-button" data-action="restart-quiz">重新测试</button>
         <button type="button" class="ghost-button" data-action="go-home">返回首页</button>
       </div>
+
+      <section class="result-catnip" aria-label="适合你的猫薄荷">
+        <h2>适合你的猫薄荷</h2>
+        <div class="result-catnip-grid">
+          ${catnipPosts
+            .map(
+              (post) => `
+                <article
+                  class="community-post-card result-catnip-card"
+                  data-action="open-community-post"
+                  data-post-id="${post.id}"
+                  role="button"
+                  tabindex="0"
+                >
+                  <img src="${post.image}" alt="${post.title}" loading="lazy" />
+                  <div class="community-post-copy">
+                    <h2>${post.title}</h2>
+                    <p>${post.copy}</p>
+                    <div class="post-meta">
+                      <span>精选推荐</span>
+                      <strong>去看看</strong>
+                    </div>
+                  </div>
+                </article>
+              `
+            )
+            .join("")}
+        </div>
+        <button type="button" class="ghost-button" data-action="open-community">进猫薄荷社区逛逛</button>
+      </section>
     </section>
   `;
 }
@@ -759,15 +914,19 @@ function renderInviteView() {
 function renderShareOverlay({ resultName }) {
   return `
     <div class="overlay-backdrop" data-action="close-share">
-      <section class="panel share-overlay" aria-label="分享图预览">
+      <section class="panel share-overlay share-overlay-poster" aria-label="分享图预览">
         <p class="eyebrow">分享图已生成</p>
         <h2>${resultName}</h2>
-        <p class="subtitle">长按或点击保存，把你的猫格发给朋友看看。</p>
+        <p class="subtitle">请直接截图保存，把你的猫格发给朋友看看。</p>
         <div class="share-preview">
           <img id="share-preview-image" alt="${resultName} 分享图预览" />
         </div>
+        <div class="share-note-row" aria-label="截图提示">
+          <img src="./resources/quiz-options/q01/a.png" alt="" />
+          <p>建议在全屏模式下截图，分享到朋友圈/群聊更清晰。</p>
+          <img src="./resources/quiz-options/q01/d.png" alt="" />
+        </div>
         <div class="result-actions">
-          <button type="button" data-action="download-share">保存图片</button>
           <button type="button" class="ghost-button" data-action="close-share">关闭</button>
         </div>
       </section>
@@ -801,6 +960,7 @@ Object.assign(MaoBTI, {
   renderInviteView,
   renderProfileView,
   renderQuizView,
+  renderBottomTabbar,
   renderResultView,
   renderShareOverlay,
   renderTestsView

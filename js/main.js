@@ -28,6 +28,7 @@ const {
   renderInviteView,
   renderProfileView,
   renderQuizView,
+  renderBottomTabbar,
   renderResultView,
   renderShareOverlay,
   renderTestsView,
@@ -102,6 +103,27 @@ const MODE_ORDER = [
   "invite"
 ];
 
+const SHARE_CAT_ICON_DATA_URI = `data:image/svg+xml;utf8,${encodeURIComponent(`
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffe9c8"/>
+      <stop offset="100%" stop-color="#ffd29e"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="320" rx="44" fill="url(#bg)"/>
+  <circle cx="160" cy="184" r="96" fill="#ffe1bf"/>
+  <path d="M84 124 126 72l22 62z" fill="#f3b98a"/>
+  <path d="M236 124 194 72l-22 62z" fill="#f3b98a"/>
+  <circle cx="122" cy="184" r="12" fill="#2f1f12"/>
+  <circle cx="198" cy="184" r="12" fill="#2f1f12"/>
+  <path d="M160 205 148 220h24z" fill="#f08ca0"/>
+  <path d="M122 222c18 16 58 16 76 0" stroke="#2f1f12" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <circle cx="74" cy="84" r="16" fill="#ffffff" fill-opacity="0.22"/>
+  <circle cx="258" cy="72" r="12" fill="#ffffff" fill-opacity="0.2"/>
+</svg>
+`)}`;
+
 function getRenderDirection(nextMode) {
   if (!lastRenderedMode || lastRenderedMode === nextMode) {
     return "refresh";
@@ -118,6 +140,13 @@ function getRenderDirection(nextMode) {
 }
 
 function renderApp(html) {
+  const dockConfig = resolveDockConfig(mode);
+  const dockHtml = renderBottomTabbar(
+    dockConfig.activeTab,
+    dockConfig.testAction,
+    dockConfig.label
+  );
+  const cleanedHtml = html.replace(/<nav class="bottom-tabbar"[\s\S]*?<\/nav>/g, "");
   const direction = getRenderDirection(mode);
 
   if (app.dataset) {
@@ -128,8 +157,39 @@ function renderApp(html) {
     app.setAttribute("data-transition", direction);
   }
 
-  app.innerHTML = html;
+  app.innerHTML = `${cleanedHtml}${dockHtml}`;
   lastRenderedMode = mode;
+}
+
+function resolveDockConfig(currentMode) {
+  if (currentMode === "home") {
+    return { activeTab: "home", testAction: "start-quiz", label: "首页导航" };
+  }
+
+  if (currentMode === "collection") {
+    return { activeTab: "collection", testAction: "open-tests", label: "图鉴导航" };
+  }
+
+  if (currentMode === "tests" || currentMode === "quiz" || currentMode === "result") {
+    return { activeTab: "test", testAction: "open-tests", label: "测试导航" };
+  }
+
+  if (currentMode === "community" || currentMode === "community-post") {
+    return { activeTab: "community", testAction: "open-tests", label: "社区导航" };
+  }
+
+  if (
+    currentMode === "profile" ||
+    currentMode === "invite" ||
+    currentMode === "game" ||
+    currentMode === "game-detail" ||
+    currentMode === "game-play" ||
+    currentMode === "game-leaderboard"
+  ) {
+    return { activeTab: "profile", testAction: "open-tests", label: "个人导航" };
+  }
+
+  return { activeTab: "home", testAction: "open-tests", label: "底部导航" };
 }
 
 function buildResultImage(result) {
@@ -336,13 +396,6 @@ function closeCollectionLockedOverlay() {
   removeOverlay(".overlay-backdrop[data-action='close-collection-locked']");
 }
 
-function triggerDownload(fileName, href) {
-  const link = document.createElement("a");
-  link.download = fileName;
-  link.href = href;
-  link.click();
-}
-
 function openShare() {
   if (!shareCanvas) {
     return;
@@ -356,18 +409,39 @@ function openShare() {
     return;
   }
 
-  const ctx = shareCanvas.getContext("2d");
-  if (!ctx) {
-    return;
+  const model = buildShareCardModel(finalViewModel);
+  const logoImage = new Image();
+  const resultImage = new Image();
+  const memeImage = new Image();
+  const fallbackImage = new Image();
+  const resourceImageSrc = getResultImagePath(finalViewModel.result);
+  const memeImageSrc = "./resources/今日猫meme/猫meme分享_1_露露凯蒂_来自小红书网页版.jpg";
+  const isFileProtocol =
+    typeof window !== "undefined" && window.location?.protocol === "file:";
+
+  function renderAndExport(images) {
+    const ctx = shareCanvas.getContext("2d");
+    if (!ctx) {
+      throw new Error("share canvas context unavailable");
+    }
+
+    drawShareCard(ctx, model, images);
+    return shareCanvas.toDataURL("image/png");
   }
 
-  const model = buildShareCardModel(finalViewModel);
-  const image = new Image();
-
-  const finish = (iconImage) => {
+  const finish = (images) => {
     try {
-      drawShareCard(ctx, model, iconImage);
-      shareImageUrl = shareCanvas.toDataURL("image/png");
+      try {
+        shareImageUrl = renderAndExport(images);
+      } catch (exportError) {
+        if (images?.logoImage || images?.resultImage || images?.memeImage) {
+          shareCanvas.width = shareCanvas.width;
+          shareCanvas.height = shareCanvas.height;
+          shareImageUrl = renderAndExport({});
+        } else {
+          throw exportError;
+        }
+      }
       closeCommunityOverlay();
       closeShareOverlay();
       document.body.insertAdjacentHTML(
@@ -383,9 +457,41 @@ function openShare() {
     }
   };
 
-  image.onload = () => finish(image);
-  image.onerror = () => finish(null);
-  image.src = "./icon.png";
+  function loadImage(image, src) {
+    return new Promise((resolve) => {
+      if (!src) {
+        resolve(null);
+        return;
+      }
+
+      image.onload = () => resolve(image);
+      image.onerror = () => resolve(null);
+      image.src = src;
+    });
+  }
+
+  async function prepareAndFinish() {
+    const [loadedResultImage, loadedLogoImage, loadedMemeImage] = await Promise.all([
+      loadImage(resultImage, resourceImageSrc),
+      loadImage(logoImage, "./icon.png"),
+      loadImage(memeImage, memeImageSrc)
+    ]);
+
+    finish({
+      resultImage: loadedResultImage,
+      logoImage: loadedLogoImage,
+      memeImage: loadedMemeImage
+    });
+  }
+
+  if (isFileProtocol) {
+    fallbackImage.onload = () => finish({ logoImage: fallbackImage });
+    fallbackImage.onerror = () => finish({});
+    fallbackImage.src = SHARE_CAT_ICON_DATA_URI;
+    return;
+  }
+
+  prepareAndFinish().catch(() => finish({}));
 }
 
 function scrollCommunityGallery(direction) {
@@ -609,12 +715,6 @@ document.addEventListener("click", (event) => {
     closeCollectionLockedOverlay();
     mode = "community";
     render();
-    return;
-  }
-
-  if (target.dataset.action === "download-share" && shareImageUrl) {
-    const fileName = `maobti-${finalViewModel?.result.name ?? "share"}.png`;
-    triggerDownload(fileName, shareImageUrl);
     return;
   }
 

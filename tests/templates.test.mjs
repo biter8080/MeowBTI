@@ -92,6 +92,10 @@ test("renderResultView includes result title, auxiliary copy and actions", () =>
   assert.match(html, /我的图鉴/);
   assert.match(html, /返回首页/);
   assert.match(html, /重新测试/);
+  assert.match(html, /适合你的猫薄荷/);
+  assert.match(html, /今日猫meme/);
+  assert.match(html, /当家里的小咪有了手机/);
+  assert.match(html, /进猫薄荷社区逛逛/);
   assert.match(html, /已收录进你的图鉴/);
   assert.doesNotMatch(html, /result-hero/);
   assert.doesNotMatch(html, /result-chip/);
@@ -114,6 +118,7 @@ test("renderResultView keeps the requested action order", () => {
   assert.ok(html.indexOf("生成分享图") < html.indexOf("我的图鉴"));
   assert.ok(html.indexOf("我的图鉴") < html.indexOf("重新测试"));
   assert.ok(html.indexOf("重新测试") < html.indexOf("返回首页"));
+  assert.ok(html.indexOf("返回首页") < html.indexOf("适合你的猫薄荷"));
 });
 
 test("renderResultView places meme image before result title", () => {
@@ -303,10 +308,11 @@ test("renderCollectionLockedOverlay explains the locked state", () => {
   assert.match(html, /data-action="close-collection-locked"/);
 });
 
-test("renderShareOverlay includes preview and download actions", () => {
+test("renderShareOverlay includes preview and screenshot guidance", () => {
   const html = renderShareOverlay({ resultName: "学习猫" });
   assert.match(html, /分享图预览/);
-  assert.match(html, /保存图片/);
+  assert.match(html, /请直接截图保存/);
+  assert.doesNotMatch(html, /保存图片/);
   assert.match(html, /关闭/);
 });
 
