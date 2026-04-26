@@ -14,7 +14,13 @@ const {
   renderResultView,
   renderCommunityOverlay,
   renderShareOverlay,
-  renderTestsView
+  renderTestsView,
+  renderGameDetailView,
+  renderGameLeaderboardView,
+  renderGamePlayView,
+  renderInviteView,
+  renderProfileView,
+  renderCommunityPostView
 } = await loadAppScripts();
 
 test("renderHomeView renders CTA and disclaimer copy", () => {
@@ -42,6 +48,7 @@ test("renderQuizView includes question progress and four choices", () => {
   });
 
   assert.match(html, /1 \/ 24/);
+  assert.match(html, /返回首页/);
   assert.equal((html.match(/data-option-key=/g) || []).length, 4);
 });
 
@@ -170,20 +177,78 @@ test("renderTestsView renders demo test cards", () => {
   assert.match(html, /data-action="start-quiz"/);
 });
 
-test("renderCommunityView renders community placeholder page", () => {
+test("renderCommunityView renders community post cards", () => {
   const html = renderCommunityView();
 
-  assert.match(html, /猫薄荷社区/);
-  assert.match(html, /分享你的猫薄荷/);
-  assert.match(html, /同类推荐/);
+  assert.match(html, /猫薄荷广场/);
+  assert.match(html, /今日猫meme/);
+  assert.match(html, /当家里的小咪有了手机/);
+  assert.equal((html.match(/community-post-card/g) || []).length, 2);
+  assert.match(html, /data-action="open-community-post"/);
+});
+
+test("renderCommunityPostView renders gallery and demo comments", () => {
+  const html = renderCommunityPostView({
+    postId: "phone-cat",
+    imageIndex: 2
+  });
+
+  assert.match(html, /当家里的小咪有了手机/);
+  assert.match(html, /6 张/);
+  assert.equal((html.match(/community-gallery-slide/g) || []).length, 6);
+  assert.match(html, /data-action="prev-community-image"/);
+  assert.match(html, /data-action="next-community-image"/);
+  assert.match(html, /评论/);
+  assert.match(html, /太像我家那位了/);
 });
 
 test("renderGameView renders game placeholder page", () => {
   const html = renderGameView();
 
   assert.match(html, /游戏广场/);
-  assert.match(html, /小游戏入口占位/);
-  assert.match(html, /先去测一测/);
+  assert.match(html, /猫猫接食物/);
+  assert.match(html, /开始游戏/);
+  assert.match(html, /data-action="open-game-detail"/);
+});
+
+test("renderGameDetailView renders game detail placeholder", () => {
+  const html = renderGameDetailView();
+
+  assert.match(html, /游戏详情页/);
+  assert.match(html, /游戏介绍/);
+  assert.match(html, /data-action="open-game-play"/);
+});
+
+test("renderGamePlayView renders gameplay placeholder", () => {
+  const html = renderGamePlayView();
+
+  assert.match(html, /游戏进行页/);
+  assert.match(html, /得分/);
+  assert.match(html, /游戏主体先占位/);
+});
+
+test("renderGameLeaderboardView renders leaderboard page", () => {
+  const html = renderGameLeaderboardView();
+
+  assert.match(html, /排行榜/);
+  assert.match(html, /全球榜/);
+  assert.match(html, /奶盖不加糖/);
+});
+
+test("renderProfileView renders profile page", () => {
+  const html = renderProfileView();
+
+  assert.match(html, /我的个人中心页/);
+  assert.match(html, /常用功能/);
+  assert.match(html, /data-action="open-invite"/);
+});
+
+test("renderInviteView renders invite page", () => {
+  const html = renderInviteView();
+
+  assert.match(html, /邀请好友一起测喵BTI/);
+  assert.match(html, /立即邀请/);
+  assert.match(html, /复制链接/);
 });
 
 test("renderCollectionDetailOverlay prints unlocked result details", () => {
