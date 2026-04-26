@@ -17,10 +17,16 @@ const {
   renderCollectionLockedOverlay,
   renderCollectionView,
   renderCommunityOverlay,
+  renderCommunityPostView,
   renderCommunityView,
   renderErrorView,
+  renderGameDetailView,
+  renderGameLeaderboardView,
+  renderGamePlayView,
   renderGameView,
   renderHomeView,
+  renderInviteView,
+  renderProfileView,
   renderQuizView,
   renderResultView,
   renderShareOverlay,
@@ -68,6 +74,8 @@ let finalViewModel = null;
 let shareImageUrl = "";
 let cachedLastResult = loadLastResult(appStorage);
 let collectionState = loadCollection(appStorage);
+let communityPostId = "cat-meme";
+let communityImageIndex = 0;
 const hiddenResultImages = new Set();
 
 const app = document.querySelector("#app");
@@ -75,6 +83,54 @@ const bgCanvas = document.querySelector("#bg-canvas");
 const shareCanvas = document.querySelector("#share-canvas");
 
 startBackground(bgCanvas);
+
+let lastRenderedMode = "";
+
+const MODE_ORDER = [
+  "home",
+  "tests",
+  "quiz",
+  "result",
+  "collection",
+  "community",
+  "community-post",
+  "game",
+  "game-detail",
+  "game-play",
+  "game-leaderboard",
+  "profile",
+  "invite"
+];
+
+function getRenderDirection(nextMode) {
+  if (!lastRenderedMode || lastRenderedMode === nextMode) {
+    return "refresh";
+  }
+
+  const previousIndex = MODE_ORDER.indexOf(lastRenderedMode);
+  const nextIndex = MODE_ORDER.indexOf(nextMode);
+
+  if (previousIndex === -1 || nextIndex === -1) {
+    return "forward";
+  }
+
+  return nextIndex >= previousIndex ? "forward" : "back";
+}
+
+function renderApp(html) {
+  const direction = getRenderDirection(mode);
+
+  if (app.dataset) {
+    app.dataset.mode = mode;
+    app.dataset.transition = direction;
+  } else if (typeof app.setAttribute === "function") {
+    app.setAttribute("data-mode", mode);
+    app.setAttribute("data-transition", direction);
+  }
+
+  app.innerHTML = html;
+  lastRenderedMode = mode;
+}
 
 function buildResultImage(result) {
   const src = getResultImagePath(result);
@@ -151,10 +207,10 @@ function render() {
   }
 
   if (mode === "home") {
-    app.innerHTML = renderHomeView({
+    renderApp(renderHomeView({
       completedCount: RESULTS.length,
       unlockedCount: collectionState.unlockedResultIds.length
-    });
+    }));
     return;
   }
 
@@ -163,35 +219,68 @@ function render() {
       quizState.currentQuestionIndex,
       QUESTIONS.length - 1
     );
-    app.innerHTML = renderQuizView({
+    renderApp(renderQuizView({
       index: safeIndex,
       total: QUESTIONS.length,
       question: QUESTIONS[safeIndex]
-    });
+    }));
     return;
   }
 
   if (mode === "collection") {
-    app.innerHTML = renderCollectionView({
+    renderApp(renderCollectionView({
       unlockedCount: collectionState.unlockedResultIds.length,
       totalCount: RESULTS.length,
       items: buildCollectionItems()
-    });
+    }));
     return;
   }
 
   if (mode === "tests") {
-    app.innerHTML = renderTestsView();
+    renderApp(renderTestsView());
     return;
   }
 
   if (mode === "community") {
-    app.innerHTML = renderCommunityView();
+    renderApp(renderCommunityView());
+    return;
+  }
+
+  if (mode === "community-post") {
+    renderApp(renderCommunityPostView({
+      postId: communityPostId,
+      imageIndex: communityImageIndex
+    }));
     return;
   }
 
   if (mode === "game") {
-    app.innerHTML = renderGameView();
+    renderApp(renderGameView());
+    return;
+  }
+
+  if (mode === "game-detail") {
+    renderApp(renderGameDetailView());
+    return;
+  }
+
+  if (mode === "game-play") {
+    renderApp(renderGamePlayView());
+    return;
+  }
+
+  if (mode === "game-leaderboard") {
+    renderApp(renderGameLeaderboardView());
+    return;
+  }
+
+  if (mode === "profile") {
+    renderApp(renderProfileView());
+    return;
+  }
+
+  if (mode === "invite") {
+    renderApp(renderInviteView());
     return;
   }
 
@@ -203,7 +292,7 @@ function render() {
     result: finalViewModel.result
   };
   saveLastResult(appStorage, cachedLastResult);
-  app.innerHTML = renderResultView(finalViewModel);
+  renderApp(renderResultView(finalViewModel));
 }
 
 function renderError(message) {
@@ -211,39 +300,45 @@ function renderError(message) {
     return;
   }
 
-  app.innerHTML = renderErrorView(message);
+  renderApp(renderErrorView(message));
+}
+
+function shouldReduceMotion() {
+  return (
+    typeof window.matchMedia === "function" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
+}
+
+function removeOverlay(selector) {
+  const overlay = document.querySelector(selector);
+  if (!overlay) {
+    return;
+  }
+
+  if (shouldReduceMotion()) {
+    overlay.remove();
+    return;
+  }
+
+  overlay.classList.add("is-closing");
+  window.setTimeout(() => overlay.remove(), 160);
 }
 
 function closeShareOverlay() {
-  const overlay = document.querySelector(".overlay-backdrop[data-action='close-share']");
-  if (overlay) {
-    overlay.remove();
-  }
+  removeOverlay(".overlay-backdrop[data-action='close-share']");
 }
 
 function closeCommunityOverlay() {
-  const overlay = document.querySelector(".overlay-backdrop[data-action='close-community']");
-  if (overlay) {
-    overlay.remove();
-  }
+  removeOverlay(".overlay-backdrop[data-action='close-community']");
 }
 
 function closeCollectionDetailOverlay() {
-  const overlay = document.querySelector(
-    ".overlay-backdrop[data-action='close-collection-detail']"
-  );
-  if (overlay) {
-    overlay.remove();
-  }
+  removeOverlay(".overlay-backdrop[data-action='close-collection-detail']");
 }
 
 function closeCollectionLockedOverlay() {
-  const overlay = document.querySelector(
-    ".overlay-backdrop[data-action='close-collection-locked']"
-  );
-  if (overlay) {
-    overlay.remove();
-  }
+  removeOverlay(".overlay-backdrop[data-action='close-collection-locked']");
 }
 
 function triggerDownload(fileName, href) {
@@ -285,6 +380,39 @@ function openShare() {
   image.onerror = () => finish(null);
   image.src = "./icon.png";
 }
+
+function scrollCommunityGallery(direction) {
+  const gallery = document.querySelector("[data-community-gallery]");
+  if (!gallery) {
+    return;
+  }
+
+  gallery.scrollBy({
+    left: direction * gallery.clientWidth,
+    behavior: "smooth"
+  });
+}
+
+document.addEventListener("pointerdown", (event) => {
+  const target = event.target.closest("button, [data-action], [data-collection-id]");
+  if (!target || target.classList.contains("is-pressing")) {
+    return;
+  }
+
+  target.classList.add("is-pressing");
+});
+
+document.addEventListener("pointerup", () => {
+  document.querySelectorAll(".is-pressing").forEach((item) => {
+    item.classList.remove("is-pressing");
+  });
+});
+
+document.addEventListener("pointercancel", () => {
+  document.querySelectorAll(".is-pressing").forEach((item) => {
+    item.classList.remove("is-pressing");
+  });
+});
 
 document.addEventListener("click", (event) => {
   const target = event.target.closest("[data-action], [data-option-key]");
@@ -329,6 +457,78 @@ document.addEventListener("click", (event) => {
     closeCollectionLockedOverlay();
     mode = "game";
     render();
+    return;
+  }
+
+  if (target.dataset.action === "open-game-detail") {
+    closeShareOverlay();
+    closeCommunityOverlay();
+    closeCollectionDetailOverlay();
+    closeCollectionLockedOverlay();
+    mode = "game-detail";
+    render();
+    return;
+  }
+
+  if (target.dataset.action === "open-game-play") {
+    closeShareOverlay();
+    closeCommunityOverlay();
+    closeCollectionDetailOverlay();
+    closeCollectionLockedOverlay();
+    mode = "game-play";
+    render();
+    return;
+  }
+
+  if (target.dataset.action === "open-game-leaderboard") {
+    closeShareOverlay();
+    closeCommunityOverlay();
+    closeCollectionDetailOverlay();
+    closeCollectionLockedOverlay();
+    mode = "game-leaderboard";
+    render();
+    return;
+  }
+
+  if (target.dataset.action === "open-profile") {
+    closeShareOverlay();
+    closeCommunityOverlay();
+    closeCollectionDetailOverlay();
+    closeCollectionLockedOverlay();
+    mode = "profile";
+    render();
+    return;
+  }
+
+  if (target.dataset.action === "open-invite") {
+    closeShareOverlay();
+    closeCommunityOverlay();
+    closeCollectionDetailOverlay();
+    closeCollectionLockedOverlay();
+    mode = "invite";
+    render();
+    return;
+  }
+
+  if (target.dataset.action === "open-community-post") {
+    closeShareOverlay();
+    closeCommunityOverlay();
+    closeCollectionDetailOverlay();
+    closeCollectionLockedOverlay();
+    communityPostId = target.dataset.postId || "cat-meme";
+    communityImageIndex = 0;
+    mode = "community-post";
+    render();
+    return;
+  }
+
+  if (target.dataset.action === "prev-community-image") {
+    scrollCommunityGallery(-1);
+    return;
+  }
+
+  if (target.dataset.action === "next-community-image") {
+    scrollCommunityGallery(1);
     return;
   }
 
