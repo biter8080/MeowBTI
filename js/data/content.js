@@ -23,6 +23,13 @@ function question(id, dimension, prompt, optionList, themeTag) {
   };
 }
 
+function withScoreMap(questionEntry, scoreMap) {
+  return {
+    ...questionEntry,
+    scoreMap: { ...scoreMap }
+  };
+}
+
 function result(
   id,
   typeCode,
@@ -52,8 +59,31 @@ function result(
 }
 
 const QUESTIONS = [
+  withScoreMap(
+    {
+      ...question(
+        "Q1",
+        "S",
+        "喵喵喵喵喵喵喵喵？",
+        options(
+          "喵喵喵喵，喵呜",
+          "喵呜，喵喵喵喵",
+          "喵呜",
+          "喵喵呜"
+        ),
+        "social"
+      ),
+      options: [
+        { key: "A", text: "喵喵喵喵，喵呜", image: "./resources/quiz-options/q01/a.png" },
+        { key: "B", text: "喵呜，喵喵喵喵", image: "./resources/quiz-options/q01/b.png" },
+        { key: "C", text: "喵呜", image: "./resources/quiz-options/q01/c.png" },
+        { key: "D", text: "喵喵呜", image: "./resources/quiz-options/q01/d.png" }
+      ]
+    },
+    { A: 0, B: 0, C: 0, D: 0 }
+  ),
   question(
-    "Q1",
+    "Q2",
     "S",
     "进到一个半生不熟的局，你一般是立刻巡视领地，还是先找地方窝着？",
     options(
@@ -65,7 +95,7 @@ const QUESTIONS = [
     "social"
   ),
   question(
-    "Q2",
+    "Q3",
     "S",
     "遇到一个看起来还挺顺眼的新朋友，你通常会怎么开局？",
     options(
@@ -77,7 +107,7 @@ const QUESTIONS = [
     "social"
   ),
   question(
-    "Q3",
+    "Q4",
     "S",
     "群聊热闹起来的时候，你更像哪种猫系站位？",
     options(
@@ -89,7 +119,7 @@ const QUESTIONS = [
     "social"
   ),
   question(
-    "Q4",
+    "Q5",
     "S",
     "有人主动来和你搭话时，你第一反应更接近“尾巴翘起来”还是“先观察两秒”？",
     options(
@@ -101,7 +131,7 @@ const QUESTIONS = [
     "social"
   ),
   question(
-    "Q5",
+    "Q6",
     "E",
     "心情一差，你通常是当场有点炸毛，还是表面无事发生？",
     options(
@@ -113,7 +143,7 @@ const QUESTIONS = [
     "emotion"
   ),
   question(
-    "Q6",
+    "Q7",
     "E",
     "遇到开心事时，你是那种会原地打滚分享的人，还是自己偷偷爽一下？",
     options(
@@ -125,7 +155,7 @@ const QUESTIONS = [
     "emotion"
   ),
   question(
-    "Q7",
+    "Q8",
     "E",
     "对一件事不爽时，你更像直接甩尾巴，还是回去慢慢消化？",
     options(
@@ -137,7 +167,7 @@ const QUESTIONS = [
     "emotion"
   ),
   question(
-    "Q8",
+    "Q9",
     "E",
     "被误会之后，你会立刻解释清楚，还是先把委屈揣回窝里？",
     options(
@@ -149,7 +179,7 @@ const QUESTIONS = [
     "emotion"
   ),
   question(
-    "Q9",
+    "Q10",
     "A",
     "新机会突然掉到面前，你通常会直接扑上去，还是先绕着闻两圈？",
     options(
@@ -161,7 +191,7 @@ const QUESTIONS = [
     "action"
   ),
   question(
-    "Q10",
+    "Q11",
     "A",
     "面对没做过的新东西，你更像“先上再说”还是“先研究地形”？",
     options(
@@ -173,7 +203,7 @@ const QUESTIONS = [
     "action"
   ),
   question(
-    "Q11",
+    "Q12",
     "A",
     "计划临时变动时，你是马上切换频道，还是会先卡顿一下？",
     options(
@@ -185,7 +215,7 @@ const QUESTIONS = [
     "action"
   ),
   question(
-    "Q12",
+    "Q13",
     "A",
     "别人都已经冲出去行动了，你通常是跟上、观察，还是继续按自己的节奏舔爪子？",
     options(
@@ -197,7 +227,7 @@ const QUESTIONS = [
     "action"
   ),
   question(
-    "Q13",
+    "Q14",
     "O",
     "你更喜欢哪种生活状态：像巡视地盘一样有秩序，还是随走随停看心情？",
     options(
@@ -209,7 +239,7 @@ const QUESTIONS = [
     "order"
   ),
   question(
-    "Q14",
+    "Q15",
     "O",
     "重要事情开始前，你会把猫窝铺好再上，还是边做边调整？",
     options(
@@ -221,7 +251,7 @@ const QUESTIONS = [
     "order"
   ),
   question(
-    "Q15",
+    "Q16",
     "O",
     "别人突然打乱你的安排时，你内心更像“谁动了我的纸箱”还是“算了也行”？",
     options(
@@ -233,7 +263,7 @@ const QUESTIONS = [
     "order"
   ),
   question(
-    "Q16",
+    "Q17",
     "O",
     "对自己的时间、空间和习惯，你会有种“这里是我的领地”的感觉吗？",
     options(
@@ -245,7 +275,7 @@ const QUESTIONS = [
     "order"
   ),
   question(
-    "Q17",
+    "Q18",
     "D",
     "今天状态特别好时，你更像会主动去窗边晒自己，还是默默觉得自己真不错？",
     options(
@@ -257,7 +287,7 @@ const QUESTIONS = [
     "display"
   ),
   question(
-    "Q18",
+    "Q19",
     "D",
     "被夸的时候，你通常是“这你都看出来了”，还是“别夸了我要钻桌底了”？",
     options(
@@ -269,7 +299,7 @@ const QUESTIONS = [
     "display"
   ),
   question(
-    "Q19",
+    "Q20",
     "D",
     "表达自己想法时，你更像优雅亮相，还是低调伸个爪？",
     options(
@@ -281,7 +311,7 @@ const QUESTIONS = [
     "display"
   ),
   question(
-    "Q20",
+    "Q21",
     "D",
     "如果有个能让你成为全场焦点的机会，你会跳上去，还是先看看有没有必要？",
     options(
@@ -293,7 +323,7 @@ const QUESTIONS = [
     "display"
   ),
   question(
-    "Q21",
+    "Q22",
     "P",
     "连着累了几天后，你最容易进入哪种状态：炸毛、发呆、躺平，还是硬撑着巡逻？",
     options(
@@ -305,7 +335,7 @@ const QUESTIONS = [
     "pressure"
   ),
   question(
-    "Q22",
+    "Q23",
     "P",
     "面对催促和压迫感时，你更像立刻哈气自保，还是咬咬牙继续扛？",
     options(
@@ -317,7 +347,7 @@ const QUESTIONS = [
     "pressure"
   ),
   question(
-    "Q23",
+    "Q24",
     "P",
     "有人精准踩中你的雷点时，你会当场亮爪，还是先冷脸撤离现场？",
     options(
@@ -329,7 +359,7 @@ const QUESTIONS = [
     "pressure"
   ),
   question(
-    "Q24",
+    "Q25",
     "P",
     "特别想逃离世界的时候，你一般会怎么给自己回血：躲回窝里、找人贴贴、转移注意力，还是睡一觉重启？",
     options(

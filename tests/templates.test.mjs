@@ -32,10 +32,32 @@ test("renderHomeView renders CTA and disclaimer copy", () => {
   assert.match(html, /16\s*种猫格/);
 });
 
-test("renderQuizView includes question progress and four choices", () => {
+test("renderQuizView includes question progress, four choices and option images", () => {
   const html = renderQuizView({
     index: 0,
-    total: 24,
+    total: 25,
+    question: {
+      prompt: "喵喵喵喵喵喵喵喵？",
+      options: [
+        { key: "A", text: "喵喵喵喵，喵呜", image: "./resources/quiz-options/q01/a.png" },
+        { key: "B", text: "喵呜，喵喵喵喵", image: "./resources/quiz-options/q01/b.png" },
+        { key: "C", text: "喵呜", image: "./resources/quiz-options/q01/c.png" },
+        { key: "D", text: "喵喵呜", image: "./resources/quiz-options/q01/d.png" }
+      ]
+    }
+  });
+
+  assert.match(html, /1 \/ 25/);
+  assert.equal((html.match(/data-option-key=/g) || []).length, 4);
+  assert.equal((html.match(/class="option-image"/g) || []).length, 4);
+  assert.match(html, /resources\/quiz-options\/q01\/a\.png/);
+  assert.match(html, /resources\/quiz-options\/q01\/d\.png/);
+});
+
+test("renderQuizView keeps text-only questions image-free", () => {
+  const html = renderQuizView({
+    index: 1,
+    total: 25,
     question: {
       prompt: "今天状态特别好时，你更像会主动去窗边晒自己，还是默默觉得自己真不错？",
       options: [
@@ -47,9 +69,9 @@ test("renderQuizView includes question progress and four choices", () => {
     }
   });
 
-  assert.match(html, /1 \/ 24/);
-  assert.match(html, /返回首页/);
+  assert.match(html, /2 \/ 25/);
   assert.equal((html.match(/data-option-key=/g) || []).length, 4);
+  assert.doesNotMatch(html, /class="option-image"/);
 });
 
 test("renderResultView includes result title, auxiliary copy and actions", () => {
